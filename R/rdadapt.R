@@ -30,7 +30,9 @@
 ##' @examples
 ##' 
 ##' 
-##' @importFrom 
+##' @importFrom stats median qchisq pchisq
+##' @importFrom robust covRob
+##' @importFrom qvalue qvalue
 ##' 
 ##' @export
 ##' 

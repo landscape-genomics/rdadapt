@@ -30,7 +30,8 @@
 ##' @examples
 ##' 
 ##' 
-##' @importFrom 
+##' @importFrom stats kmeans
+##' @importFrom plyr ddply
 ##' 
 ##' @export
 ##' 

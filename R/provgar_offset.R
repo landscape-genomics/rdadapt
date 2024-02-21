@@ -31,7 +31,7 @@
 ##' @examples
 ##' 
 ##' 
-##' @importFrom 
+##' @importFrom stats dist
 ##' 
 ##' @export
 ##' 

@@ -31,16 +31,15 @@
 ##' @examples
 ##' 
 ##' 
-##' @importFrom 
+##' @importFrom raster rasterToPoints pointDistance
+##' @importFrom factoextra hkmeans
+##' @importFrom plyr ddply
+##' @importFrom geometry inhulln convhulln
 ##' 
 ##' @export
 ##' 
 ##'
 ###################################################################################################
-
-# library(factoextra)
-# library(plyr)
-# library(geometry)
 
 loci_clustering <- function(RDA, K)
 {

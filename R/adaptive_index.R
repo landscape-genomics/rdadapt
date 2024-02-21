@@ -32,7 +32,8 @@
 ##' @examples
 ##' 
 ##' 
-##' @importFrom 
+##' @importFrom raster rasterToPoints rasterFromXYZ mask
+##' @importFrom XX predict
 ##' 
 ##' @export
 ##' 
