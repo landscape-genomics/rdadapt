@@ -1,6 +1,45 @@
-#### Function to estimate genetic offset between provenance and garden 
-provgar_offset <- function(RDA, K, env_garden, env_provenance, weights = NULL){
-  
+###################################################################################################
+##' @name provgar_offset
+##' @author Thibaut Capblancq
+##' 
+##' @title Genetic offset between provenance and garden
+##' 
+##' @description This function allows the user to estimate genetic offset between provenance and 
+##' garden.
+##' 
+##' @param RDA blabla
+##' @param K blabla
+##' @param env_garden blabla
+##' @param env_provenance blabla
+##' @param weights (\emph{optional, default} \code{NULL}) \cr blabla
+##' 
+##' 
+##' @return  
+##' 
+##' A \code{matrix} containing blabla
+##' 
+##' 
+##' @details
+##' 
+##' Blablabla
+##' 
+##' 
+##' @keywords 
+##' 
+##' @seealso 
+##' 
+##' @examples
+##' 
+##' 
+##' @importFrom 
+##' 
+##' @export
+##' 
+##'
+###################################################################################################
+
+provgar_offset <- function(RDA, K, env_garden, env_provenance, weights = NULL)
+{
   # Combine and scale env data for garden and 
   var_env <- rbind(env_garden, env_provenance)
   var_env <- apply(var_env, 2, scale)
@@ -8,8 +47,8 @@ provgar_offset <- function(RDA, K, env_garden, env_provenance, weights = NULL){
   
   # Predicting population adaptive index based on RDA axes
   AI <- list()
-  for(i in 1:K){
-    AI_K <- apply(var_env, 1, function(x) sum(x * RDA$CCA$biplot[,i]))
+  for (i in 1:K) {
+    AI_K <- apply(var_env, 1, function(x) sum(x * RDA$CCA$biplot[, i]))
     names(AI_K) <- row.names(var_env)
     AI[[i]] <- AI_K
     names(AI)[i] <- paste0("RDA", as.character(i))
@@ -19,13 +58,12 @@ provgar_offset <- function(RDA, K, env_garden, env_provenance, weights = NULL){
   taball <- as.data.frame(do.call(cbind, AI))
   
   # Euclidean distance between common garden and provenances RDA scores, weighted or not
-  if(!is.null(weights)){
-    weights <- (RDA$CCA$eig/sum(RDA$CCA$eig))[1:K]
-    taball <- do.call(cbind, lapply(1:K, function(x) taball[,x]*weights[x]))
-    eucloffset <- as.matrix(dist(taball, method = "euclidean"))[,1]
-  }
-  else {
-    eucloffset <- as.matrix(dist(taball, method = "euclidean"))[,1]
+  if (!is.null(weights)) {
+    weights <- (RDA$CCA$eig / sum(RDA$CCA$eig))[1:K]
+    taball <- do.call(cbind, lapply(1:K, function(x) taball[, x] * weights[x]))
+    eucloffset <- as.matrix(dist(taball, method = "euclidean"))[, 1]
+  } else {
+    eucloffset <- as.matrix(dist(taball, method = "euclidean"))[, 1]
   }
   
   # Return the euclidean distances 
