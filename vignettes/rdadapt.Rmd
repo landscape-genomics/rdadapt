@@ -65,8 +65,8 @@ We show how to run the package using XXX
 To run the package, you need to install the package and load it using the following command lines:
 
 ```{r, message=FALSE, results='hide', eval=TRUE}
-install.packages("pcadapt")
-library(pcadapt)
+install.packages("rdadapt")
+library(rdadapt)
 ```
 
 <br>
@@ -85,11 +85,11 @@ The genomic data used to search for adaptive loci consisted of 32,407 SNPs genot
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 ## Loading genetic dataset
-Genotypes <- XXX
+Y <- read.csv2("../data/genome.csv", sep = ",", head = TRUE, row.names = 1)
 ```
 
 ```{r, message=FALSE, warning=FALSE, eval=TRUE, echo=FALSE}
-Genotypes[1:5,1:5]
+Y[1:5,1:5]
 ```
 
 We need
@@ -98,27 +98,44 @@ We need
 
 The XXX <br>
 
-<h4>1.2. Climatic variables</h4>
-
-The values of XXX
-
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
-## Loading the climatic rasters
-XX <- XXX
-```
-
-A perfect
-
-<br>
-
-<h4>1.3. Phenotypic traits</h4>
+<h4>1.2. Metadata individuals and populations</h4>
 
 The
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
-## Estimating mean trait value per population
-traits <- XXX
+## Get population labels
+pop <- read.csv2("../data/pop.csv", sep = ",", head = TRUE)[,-1]
+
+## Get individual coordinates
+coord <- read.csv2("../data/position.csv", sep = ",", head = TRUE)[,-1]
+plot(coord, cex =.2)
+
 ```
+
+<h4>1.3. Climatic variables</h4>
+
+The values of XXX
+
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
+## Loading the current and future climatic variables
+xx.current <- read.table("../data/var_current.csv", sep = ",", head = TRUE, row.names = 1)
+xx.future <- read.table("../data/var_futur.csv", sep = ",", head = TRUE, row.names = 1)
+
+## Add exxtra variables (correlated)
+xx.current <- data.frame(xx.current,VAR3 = 2*xx.current[,1] - xx.current[,2] + rnorm(nrow(xx.current), sd = 0.07), VAR4 = xx.current[,1] + xx.current[,2] + rnorm(nrow(xx.current), sd = 0.08))
+xx.future <- data.frame(xx.future,VAR3 = 2*xx.future[,1] - xx.future[,2] + rnorm(nrow(xx.future), sd = 0.07), VAR4 = xx.future[,1] + xx.future[,2] + rnorm(nrow(xx.future), sd = 0.08))
+
+# Rasterize the variables
+xx.ras.current <- rast(data.frame(x = rep(1:10, time = 10), y = rep(1:10, each = 10), aggregate(xx.current, by = list(pop), mean)[,-1]), type="xyz")
+xx.ras.future <- rast(data.frame(x = rep(1:10, time = 10),y = rep(1:10, each = 10), aggregate(xx.future, by = list(pop), mean)[,-1]), type="xyz")
+```
+```{r, message=FALSE, warning=FALSE, eval=TRUE, echo=FALSE}
+xx.current[1:5,]
+xx.future[1:5,]
+```
+A perfect
+
+<br>
 
 ```{r, message=FALSE, warning=FALSE, eval=TRUE, echo=FALSE}
 traits[1:5,1:6]
