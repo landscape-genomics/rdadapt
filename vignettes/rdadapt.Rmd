@@ -274,7 +274,7 @@ $$ Where *a* is the climatic variable score (loading) along the RDA axis, *b* is
 ## Function to predict the adaptive index across the landscape
 source("../R/adaptive_index.R")
 
-## Running the function for all the climatic pixels of lodgepole pine distribution range
+## Running the function for all pixels 
 res_RDA_proj_current <- adaptive_index(RDA = RDA_outliers, K = 2, env_pres = xx.ras.current, range = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 ```
 
