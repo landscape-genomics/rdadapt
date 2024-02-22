@@ -117,10 +117,18 @@ xx.current <- data.frame(xx.current,VAR3 = 2*xx.current[,1] - xx.current[,2] + r
 xx.future <- data.frame(xx.future,VAR3 = 2*xx.future[,1] - xx.future[,2] + rnorm(nrow(xx.future), sd = 0.07), VAR4 = xx.future[,1] + xx.future[,2] + rnorm(nrow(xx.future), sd = 0.08))
 
 # Rasterize the variables
-xx.ras.current <- rast(data.frame(x = rep(1:10, time = 10), y = rep(1:10, each = 10), aggregate(xx.current, by = list(pop), mean)[,-1]), type="xyz", crs = crs("epsg:4326"))
+xx.ras.current <- rast(data.frame(x = rep(1:12, time = 12), 
+                                  y = rep(1:12, each = 12), 
+                                  aggregate(xx.current, by = list(ceiling(as.numeric(coord$x)), ceiling(as.numeric(coord$y))), mean)[,-c(1,2)]), 
+                       type="xyz", 
+                       crs = crs("epsg:4326"))
 plot(xx.ras.current)
 
-xx.ras.future <- rast(data.frame(x = rep(1:10, time = 10),y = rep(1:10, each = 10), aggregate(xx.future, by = list(pop), mean)[,-1]), type="xyz", crs = crs("epsg:4326"))
+xx.ras.future <- rast(data.frame(x = rep(1:12, time = 12),
+                                 y = rep(1:12, each = 12), 
+                                 aggregate(xx.future, by = list(ceiling(as.numeric(coord$x)), ceiling(as.numeric(coord$y))), mean)[,-c(1,2)]), 
+                      type="xyz", 
+                      crs = crs("epsg:4326"))
 plot(xx.ras.future)
 ```
 
@@ -340,6 +348,21 @@ ggplot(data = RDA_proj_offset) +
   xlab("Longitude") + ylab("Latitude") +
   theme_bw(base_size = 11, base_family = "Times") +
   theme(panel.grid = element_blank(), plot.background = element_blank(), panel.background = element_blank(), strip.text = element_text(size=11))
+```
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10}
+
+diff.env <- sqrt(rowSums(as.data.frame((xx.ras.current[[1:2]] - xx.ras.future[[1:2]])^2)))
+plot(diff.env, RDA_proj_offset$Global_offset)
+fitness <- read.table("../data/fitness_futur.csv", header = T, sep = ",")
+
+fitness.future <- rast(data.frame(x = rep(1:12, time = 12),
+                                  y = rep(1:12, each = 12),
+                                  aggregate(fitness[,2], by = list(ceiling(as.numeric(coord$x)), ceiling(as.numeric(coord$y))), mean)[,-c(1,2)]), 
+                      type="xyz", 
+                      crs = crs("epsg:4326"))
+
+plot(log(as.data.frame(fitness.future)[,1])~RDA_proj_offset$Global_offset)
+
 ```
 
 <br>
