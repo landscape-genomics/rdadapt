@@ -41,7 +41,19 @@
 
 rdadapt <- function(rda, K)
 {
+  ## Checks
+  # inherits(rda, "rda")
+  # "CCA" %in% names(rda) ## should not be necessary ?
+  # "v" %in% names(rda$CCA) ## should not be necessary ?
+  # K <= ncol(rda$CCA$v)
+  
   zscores <- rda$CCA$v[, 1:as.numeric(K)]
+  return(rdadapt.z(zscores))
+}
+
+rdadapt.z <- function(zscores)
+{
+  K <- ncol(zscores)
   resscale <- apply(zscores, 2, scale)
   resmaha <- covRob(resscale, distance = TRUE, na.action = na.omit, estim = "pairwiseGK")$dist
   lambda <- median(resmaha) / qchisq(0.5, df = K)

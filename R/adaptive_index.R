@@ -32,61 +32,71 @@
 ##' @examples
 ##' 
 ##' 
-##' @importFrom raster rasterToPoints rasterFromXYZ mask
-##' @importFrom XX predict
+##' @importFrom foreach foreach %do%
+##' @importFrom terra crs rast as.data.frame mask
+##' @importFrom vegan predict
 ##' 
 ##' @export
 ##' 
 ##'
 ###################################################################################################
 
-adaptive_index <- function(RDA, K, env_pres, range = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+
+adaptive_index <- function(rda, K, env_pres, range = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 {
+  ## Checks
+  # inherits(rda, "rda")
+  # "CCA" %in% names(rda) ## should not be necessary ?
+  # "biplot" %in% names(rda$CCA) ## should not be necessary ?
+  # K <= ncol(rda$CCA$biplot)
+  # inherits(env_pres, c("SpatRaster", "RasterLayer", "RasterStack"))
+  # row.names(rda_biplot) %in% names(env_pres)
+  # method %in% c("loadings", "predict")
+  # length(scale_env) == nrow(rda_biplot)
+  # length(center_env) == nrow(rda_biplot)
+  # names(scale_env) == row.names(rda_biplot)
+  # names(center_env) == row.names(rda_biplot)
+  # inherits(range, c("SpatRaster", "RasterLayer", "RasterStack"))
+  # nlyr(range) == 1 ?
   
-  # Formatting environmental rasters for projection
-  var_env_proj_pres <- as.data.frame(env_pres[[row.names(RDA$CCA$biplot)]], xy = TRUE)
   
-  # Standardization of the environmental variables if necessary
-  var_env_proj_RDA <- as.data.frame(var_env_proj_pres[, -c(1, 2)])
-  if (!(is.null(scale_env)&is.null(center_env))) {
-  var_env_proj_RDA <- as.data.frame(scale(var_env_proj_RDA, 
-                                          center_env[row.names(RDA$CCA$biplot)], 
-                                          scale_env[row.names(RDA$CCA$biplot)]))
+  ## Get RDA informations -----------------------------------------------------
+  rda_biplot <- rda$CCA$biplot
+  var_names <- row.names(rda_biplot)
+  
+  ## Transform environmental raster for prediction
+  env_crs <- crs(env_pres)
+  env_df <- as.data.frame(env_pres[[var_names]], xy = TRUE)
+  env_xy <- env_df[, c("x", "y")]
+  env_var <- env_df[, var_names]
+  
+  if (!(is.null(scale_env) & is.null(center_env))) { ## Standardize environmental variables
+    # env_var <- as.data.frame(scale(env_var, center_env[var_names], scale_env[var_names])) ## MARCHE PAS
+    env_var <- as.data.frame(scale(env_var, center_env, scale_env)) ## one value only
   }
   
-  # Predicting pixels genetic component based on RDA axes
-  Proj_pres <- list()
-  if (method == "loadings") {
-    for (i in 1:K) {
-      ras_pres <- rast(data.frame(var_env_proj_pres[, c(1, 2)], 
-                                  as.vector(apply(var_env_proj_RDA[,names(RDA$CCA$biplot[, i])], 1, function(x) sum(x * RDA$CCA$biplot[, i])))), 
-                       type="xyz",
-                       crs = crs(env_pres))
-      names(ras_pres) <- paste0("RDA_pres_", as.character(i))
-      Proj_pres[[i]] <- ras_pres
-      names(Proj_pres)[i] <- paste0("RDA", as.character(i))
-    }
-  }
-  
-  # Prediction with RDA model and linear combinations
+  ## MAKE PREDICTIONS ---------------------------------------------------------
   if (method == "predict") {
-    pred <- predict(RDA, var_env_proj_RDA[, names(RDA$CCA$biplot[, i])],  type = "lc")
-    for (i in 1:K) {
-      ras_pres <- rast(data.frame(var_env_proj_pres[, c(1, 2)],
-                                  as.vector(pred[, i])),
-                       type="xyz",
-                       crs = crs(env_pres))
-      names(ras_pres) <- paste0("RDA_pres_", as.character(i))
-      Proj_pres[[i]] <- ras_pres
-      names(Proj_pres)[i] <- paste0("RDA", as.character(i))
+    pred <- predict(rda, env_var, type = "lc")
+  }
+  Proj_pres <- foreach(i = 1:K) %do%
+    {
+      if (method == "loadings") { ## Predict pixels genetic component based on RDA axes
+        tmp_df <- data.frame(env_xy, z = as.vector(apply(env_var,  1, function(x) sum(x * rda_biplot[, i]))))
+      } else if (method == "predict") { ## Predict with RDA model and linear combinations
+        tmp_df <- data.frame(env_xy, z = as.vector(pred[, i]))
+      }
+      ras_pres <- rast(tmp_df, type = "xyz", crs = crs(env_pres))
+      names(ras_pres) <- paste0("RDA", as.character(i))
+      return(ras_pres)
     }
+  Proj_pres <- rast(Proj_pres)
+  
+  if (!is.null(range)) { ## Mask with range
+    Proj_pres <- mask(Proj_pres, range)
   }
   
-  # Mask with the range if supplied
-  if (!is.null(range)) {
-    Proj_pres <- lapply(Proj_pres, function(x) mask(x, range))
-  }
   
-  # Returning projections for current climates for each RDA axis
-  return(Proj_pres = Proj_pres)
+  ## Return predictions for each RDA axis
+  return(Proj_pres)
 }
