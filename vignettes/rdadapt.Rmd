@@ -70,6 +70,8 @@ To run the package, you need to install the package and load it using the follow
 library(vegan)
 library(robust)
 library(ggplot2)
+library(terra)
+library(qvalue)
 ```
 
 <br>
@@ -115,10 +117,10 @@ xx.current <- data.frame(xx.current,VAR3 = 2*xx.current[,1] - xx.current[,2] + r
 xx.future <- data.frame(xx.future,VAR3 = 2*xx.future[,1] - xx.future[,2] + rnorm(nrow(xx.future), sd = 0.07), VAR4 = xx.future[,1] + xx.future[,2] + rnorm(nrow(xx.future), sd = 0.08))
 
 # Rasterize the variables
-xx.ras.current <- rast(data.frame(x = rep(1:10, time = 10), y = rep(1:10, each = 10), aggregate(xx.current, by = list(pop), mean)[,-1]), type="xyz")
+xx.ras.current <- rast(data.frame(x = rep(1:10, time = 10), y = rep(1:10, each = 10), aggregate(xx.current, by = list(pop), mean)[,-1]), type="xyz", crs = crs("epsg:4326"))
 plot(xx.ras.current)
 
-xx.ras.future <- rast(data.frame(x = rep(1:10, time = 10),y = rep(1:10, each = 10), aggregate(xx.future, by = list(pop), mean)[,-1]), type="xyz")
+xx.ras.future <- rast(data.frame(x = rep(1:10, time = 10),y = rep(1:10, each = 10), aggregate(xx.future, by = list(pop), mean)[,-1]), type="xyz", crs = crs("epsg:4326"))
 plot(xx.ras.future)
 ```
 
@@ -283,29 +285,27 @@ The adaptive index thus provides an estimate of adaptive genetic similarity or d
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10}
 ## Vectorization of the climatic rasters for ggplot
 RDA_proj <- list(res_RDA_proj_current$RDA1, res_RDA_proj_current$RDA2)
-RDA_proj <- lapply(RDA_proj, function(x) rasterToPoints(x))
+RDA_proj <- lapply(RDA_proj, function(x) as.data.frame(x, xy = TRUE))
 for(i in 1:length(RDA_proj)){
   RDA_proj[[i]][,3] <- (RDA_proj[[i]][,3]-min(RDA_proj[[i]][,3]))/(max(RDA_proj[[i]][,3])-min(RDA_proj[[i]][,3]))
+  colnames(RDA_proj[[i]])[3] <- "value"
 }
 
 ## Adaptive genetic turnover projected across lodgepole pine range for RDA1 and RDA2 indexes
 TAB_RDA <- as.data.frame(do.call(rbind, RDA_proj[1:2]))
-colnames(TAB_RDA)[3] <- "value"
 TAB_RDA$variable <- factor(c(rep("RDA1", nrow(RDA_proj[[1]])), rep("RDA2", nrow(RDA_proj[[2]]))), levels = c("RDA1","RDA2"))
 ggplot(data = TAB_RDA) + 
-  geom_sf(data = admin, fill=gray(.9), size=0) +
+#geom_sf(data = admin, fill=gray(.9), size=0) +
   geom_raster(aes(x = x, y = y, fill = cut(value, breaks=seq(0, 1, length.out=10), include.lowest = T))) + 
   scale_fill_viridis_d(alpha = 0.8, direction = -1, option = "A", labels = c("Negative scores","","","","Intermediate scores","","","","Positive scores")) +
-  geom_sf(data = admin, fill=NA, size=0.1) +
-  coord_sf(xlim = c(-148, -98), ylim = c(35, 64), expand = FALSE) +
+  #geom_sf(data = admin, fill=NA, size=0.1) +
+  #coord_sf(xlim = c(-148, -98), ylim = c(35, 64), expand = FALSE) +
   xlab("Longitude") + ylab("Latitude") +
   guides(fill=guide_legend(title="Adaptive index")) +
   facet_grid(~ variable) +
   theme_bw(base_size = 11, base_family = "Times") +
   theme(panel.grid = element_blank(), plot.background = element_blank(), panel.background = element_blank(), strip.text = element_text(size=11))
 ```
-
-**Notes on interpretation and best practices:** We remind users that any prediction procedure such as this relies on the extrapolation of correlative relationships and carries potential pitfalls. Predicting any genetic-based adaptive index in unsampled areas could be strongly biased if the value or combination of the environmental predictors in those projected areas exceed those used to train the model. Similarly, any projection could be inaccurate if the genetic \~ environment relationship is not well characterized, either because the scale of the analyses (e.g., size of the pixel) does not capture the complexity of the association, or because the distribution of the identified genetic variation is not optimal across the current and/or future environmental landscape (e.g., due to recent demographic history, barriers to gene flow, genetic drift in small populations, fluctuating trait heritability, varying selection pressures, or genetic architecture). It is critical to avoid overinterpretation of adaptive index projections, especially when validation data are not available.
 
 <br>
 
@@ -323,7 +323,7 @@ Once the genetic \~ environment relationship is characterized, it can be extrapo
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10}
 ## Function to predict genomic offset from a RDA model
-source("./src/genomic_offset.R")
+source("../data/genomic_offset.R")
 
 ## Running the function for 2050 and 2080
 res_RDA_proj2080 <- genomic_offset(RDA_outliers, K = 2, env_pres = ras_6190, env_fut = ras_2080, range = range, method = "loadings", scale_env = scale_env, center_env = center_env)
