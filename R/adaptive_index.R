@@ -9,8 +9,8 @@
 ##' 
 ##' @param RDA blabla
 ##' @param K blabla
-##' @param env_pres blabla
-##' @param range (\emph{optional, default} \code{NULL}) \cr blabla
+##' @param env blabla
+##' @param env_mask (\emph{optional, default} \code{NULL}) \cr blabla
 ##' @param method  (\emph{default} \code{'loadings'}) \cr blabla
 ##' @param scale_env blabla
 ##' @param center_env blabla
@@ -42,22 +42,22 @@
 ###################################################################################################
 
 
-adaptive_index <- function(rda, K, env_pres, range = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+adaptive_index <- function(rda, K, env, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 {
   ## Checks
   # inherits(rda, "rda")
   # "CCA" %in% names(rda) ## should not be necessary ?
   # "biplot" %in% names(rda$CCA) ## should not be necessary ?
   # K <= ncol(rda$CCA$biplot)
-  # inherits(env_pres, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # row.names(rda_biplot) %in% names(env_pres)
+  # inherits(env, c("SpatRaster", "RasterLayer", "RasterStack"))
+  # row.names(rda_biplot) %in% names(env)
   # method %in% c("loadings", "predict")
   # length(scale_env) == nrow(rda_biplot)
   # length(center_env) == nrow(rda_biplot)
   # names(scale_env) == row.names(rda_biplot)
   # names(center_env) == row.names(rda_biplot)
-  # inherits(range, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # nlyr(range) == 1 ?
+  # inherits(env_mask, c("SpatRaster", "RasterLayer", "RasterStack"))
+  # nlyr(env_mask) == 1 ?
   
   
   ## Get RDA informations -----------------------------------------------------
@@ -65,11 +65,11 @@ adaptive_index <- function(rda, K, env_pres, range = NULL, method = "loadings", 
   var_names <- row.names(rda_biplot)
   
   ## Transform environmental raster for prediction
-  if (!is.null(range)) { ## Mask with range ## TODO MOVE UP
-    env_pres <- mask(env_pres, range)
+  if (!is.null(env_mask)) { ## Mask with env_mask
+    env <- mask(env, env_mask)
   }
-  env_crs <- crs(env_pres)
-  env_df <- as.data.frame(env_pres[[var_names]], xy = TRUE)
+  env_crs <- crs(env)
+  env_df <- as.data.frame(env[[var_names]], xy = TRUE)
   env_xy <- env_df[, c("x", "y")]
   env_var <- env_df[, var_names]
   
@@ -90,7 +90,7 @@ adaptive_index <- function(rda, K, env_pres, range = NULL, method = "loadings", 
       } else if (method == "predict") { ## Predict with RDA model and linear combinations
         tmp_df <- data.frame(env_xy, z = as.vector(pred[, i]))
       }
-      ras <- rast(tmp_df, type = "xyz", crs = crs(env_pres))
+      ras <- rast(tmp_df, type = "xyz", crs = crs(env))
       names(ras) <- paste0("RDA", i)
       return(ras)
     }
