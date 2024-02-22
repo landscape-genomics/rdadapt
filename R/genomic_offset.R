@@ -42,102 +42,102 @@
 ##'
 ###################################################################################################
 
-genomic_offset <- function(RDA, K, env_pres, env_fut, range = NULL, method = "loadings", scale_env, center_env)
+
+genomic_offset <- function(rda, K, env_pres, env_fut, range = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 {
+  ## Checks
+  # inherits(rda, "rda")
+  # "CCA" %in% names(rda) ## should not be necessary ?
+  # "biplot" %in% names(rda$CCA) ## should not be necessary ?
+  # "eig" %in% names(rda$CCA) ## should not be necessary ?
+  # K <= ncol(rda$CCA$biplot)
+  # inherits(env_pres, c("SpatRaster", "RasterLayer", "RasterStack"))
+  # row.names(rda_biplot) %in% names(env_pres)
+  # method %in% c("loadings", "predict")
+  # length(scale_env) == nrow(rda_biplot)
+  # length(center_env) == nrow(rda_biplot)
+  # names(scale_env) == row.names(rda_biplot)
+  # names(center_env) == row.names(rda_biplot)
+  # inherits(range, c("SpatRaster", "RasterLayer", "RasterStack"))
+  # nlyr(range) == 1 ?
   
-  # Mask with the range if supplied
-  if (!is.null(range)) {
+  ## Get RDA informations -----------------------------------------------------
+  rda_biplot <- rda$CCA$biplot
+  var_names <- row.names(rda_biplot)
+  weights <- rda$CCA$eig / sum(rda$CCA$eig) ## Weights based on axis eigen values
+  
+  ## Transform environmental raster for prediction
+  if (!is.null(range)) { ## Mask with range
     env_pres <- mask(env_pres, range)
     env_fut <- mask(env_fut, range)
   }
+  env_crs <- crs(env_pres)
+  env_df_pres <- as.data.frame(env_pres[[var_names]], xy = TRUE)
+  env_df_fut <- as.data.frame(env_fut[[var_names]], xy = TRUE)
+  env_xy <- env_df_pres[, c("x", "y")]
+  env_var_pres <- env_df_pres[, var_names]
+  env_var_fut <- env_df_fut[, var_names]
   
-  # Formatting and scaling environmental rasters for projection
-  var_env_proj_pres <- as.data.frame(env_pres[[row.names(RDA$CCA$biplot)]], xy = FALSE)
-  var_env_proj_fut <- as.data.frame(env_fut[[row.names(RDA$CCA$biplot)]], xy = FALSE)
-  if (!(is.null(scale_env)&is.null(center_env))) {
-  var_env_proj_pres <- as.data.frame(scale(var_env_proj_pres, 
-                                           center_env[row.names(RDA$CCA$biplot)], 
-                                           scale_env[row.names(RDA$CCA$biplot)]))
-  var_env_proj_fut <- as.data.frame(scale(var_env_proj_fut, 
-                                          center_env[row.names(RDA$CCA$biplot)], 
-                                          scale_env[row.names(RDA$CCA$biplot)]))
+  if (!(is.null(scale_env) & is.null(center_env))) { ## Standardize environmental variables
+    # env_var <- as.data.frame(scale(env_var, center_env[var_names], scale_env[var_names])) ## MARCHE PAS
+    env_var_pres <- as.data.frame(scale(env_var_pres, center_env, scale_env)) ## one value only
+    env_var_fut <- as.data.frame(scale(env_var_fut, center_env, scale_env)) ## one value only
   }
-  # Predicting pixels genetic component based on the loadings of the variables
-  if (method == "loadings") {
-    # Projection for each RDA axis
-    Proj_pres <- list()
-    Proj_fut <- list()
-    Proj_offset <- list()
-    for (i in 1:K) {
-      # Current climates
-      ras_pres <- env_pres[[1]]
-      ras_pres[!is.na(ras_pres)] <- as.vector(apply(var_env_proj_pres[, names(RDA$CCA$biplot[, i])], 1, function(x) sum(x * RDA$CCA$biplot[, i])))
-      names(ras_pres) <- paste0("RDA_pres_", as.character(i))
-      Proj_pres[[i]] <- ras_pres
-      names(Proj_pres)[i] <- paste0("RDA", as.character(i))
-      # Future climates
-      ras_fut <- env_fut[[1]]
-      ras_fut[!is.na(ras_fut)] <- as.vector(apply(var_env_proj_fut[,names(RDA$CCA$biplot[, i])], 1, function(x) sum(x * RDA$CCA$biplot[, i])))
-      names(ras_fut) <- paste0("RDA_fut_", as.character(i))
-      Proj_fut[[i]] <- ras_fut
-      names(Proj_fut)[i] <- paste0("RDA", as.character(i))
-      # Single axis genetic offset 
-      Proj_offset[[i]] <- abs(Proj_pres[[i]] - Proj_fut[[i]])
-      names(Proj_offset)[i] <- paste0("RDA", as.character(i))
+  
+  
+  ## MAKE PREDICTIONS ---------------------------------------------------------
+  if (method == "predict") {
+    pred_pres <- predict(rda, env_var_pres, type = "lc")
+    pred_fut <- predict(rda, env_var_fut, type = "lc")
+  }
+  RES <- foreach(i = 1:K) %do%
+    {
+      ## Current and future predictions
+      Proj <- foreach(sce = c("pres", "fut"), env = list(env_var_pres, env_var_fut), pred = list(pred_pres, pred_fut)) %do%
+        {
+          if (method == "loadings") {
+            ras <- env_pres[[1]]
+            ras[!is.na(ras)] <- as.vector(apply(env, 1, function(x) sum(x * rda_biplot[, i])))
+          } else {
+            tmp_df <- data.frame(env_xy, Z = as.vector(pred[, i]))
+            ras <- rast(tmp_df, type = "xyz", crs = env_crs)
+          }
+          names(ras) <- paste0("RDA", i, "_", sce)
+          return(ras)
+        }
+      Proj <- rast(Proj)
+      
+      ## Single axis genetic offset 
+      Proj_offset <- abs(Proj[[1]] - Proj[[2]])
+      names(Proj_offset) <- paste0("RDA", i)
+      
+      return(list(proj = Proj, offset = Proj_offset))
+    }
+  names(RES) <- paste0("RDA", 1:K)
+  
+  
+  ## Weight current and future adaptive indices based on eigen values of associated axes
+  proj_df <- do.call(cbind, lapply(1:K, function(x) as.data.frame(RES[[x]]$proj, xy = FALSE)))
+  for (i in 1:K) {
+    ind_i <- grep(names(weights)[i], colnames(proj_df))
+    for (ii in ind_i) {
+      proj_df[, ii] <- proj_df[, ii] * weights[i]
     }
   }
   
-  # Predicting pixels genetic component based on predict.RDA
-  if (method == "predict") { 
-    # Prediction with the RDA model and both set of envionments 
-    pred_pres <- predict(RDA, var_env_proj_pres, type = "lc")
-    pred_fut <- predict(RDA, var_env_proj_fut, type = "lc")
-    # List format
-    Proj_offset <- list()    
-    Proj_pres <- list()
-    Proj_fut <- list()
-    for (i in 1:K) {
-      # Current climates
-      ras_pres <- rast(data.frame(var_env_proj_pres, 
-                                  Z = as.vector(pred_pres[,i])), 
-                       type="xyz",
-                       crs = crs(env_pres))
-      names(ras_pres) <- paste0("RDA_pres_", as.character(i))
-      Proj_pres[[i]] <- ras_pres
-      names(Proj_pres)[i] <- paste0("RDA", as.character(i))
-      # Future climates
-      ras_fut <- rast(data.frame(var_env_proj_pres,
-                                 Z = as.vector(pred_fut[,i])),
-                               type="xyz",
-                               crs = crs(env_pres))
-      names(ras_fut) <- paste0("RDA_fut_", as.character(i))
-      Proj_fut[[i]] <- ras_fut
-      names(Proj_fut)[i] <- paste0("RDA", as.character(i))
-      # Single axis genetic offset 
-      Proj_offset[[i]] <- abs(Proj_pres[[i]] - Proj_fut[[i]])
-      names(Proj_offset)[i] <- paste0("RDA", as.character(i))
-    }
-  }
-  
-  # Weights based on axis eigen values
-  weights <- RDA$CCA$eig / sum(RDA$CCA$eig)
-  
-  # Weighing the current and future adaptive indices based on the eigen values of the associated axes
-  Proj_offset_pres <- do.call(cbind, lapply(1:K, function(x) as.data.frame(Proj_pres[[x]], xy = FALSE)))
-  Proj_offset_pres <- as.data.frame(do.call(cbind, lapply(1:K, function(x) Proj_offset_pres[, x] * weights[x])))
-  Proj_offset_fut <- do.call(cbind, lapply(1:K, function(x) as.data.frame(Proj_fut[[x]], xy = FALSE)))
-  Proj_offset_fut <- as.data.frame(do.call(cbind, lapply(1:K, function(x) Proj_offset_fut[, x] * weights[x])))
-  
-  # Predict a global genetic offset, incorporating the K first axes weighted by their eigen values
-  ras <- Proj_offset[[1]]
-  ras[!is.na(ras)] <- unlist(lapply(1:nrow(Proj_offset_pres), 
-                                    function(x) dist(rbind(Proj_offset_pres[x, ], Proj_offset_fut[x, ]), method = "euclidean")))
-  names(ras) <- "Global_offset"
-  Proj_offset_global <- ras
+  ## Predict a global genetic offset
+  offset_global <- RES[[1]]$offset
+  offset_global[!is.na(offset_global)] <- sapply(1:nrow(proj_df), function(x) {
+    tmp_mat <- rbind(unlist(proj_df[x, grep("pres", colnames(proj_df))])
+                     , unlist(proj_df[x, grep("fut", colnames(proj_df))]))
+    return(dist(tmp_mat, method = "euclidean"))
+  })
+  names(offset_global) <- "Global_offset"
   
   # Return projections for current and future climates for each RDA axis, prediction of genetic offset for each RDA axis and a global genetic offset 
-  return(list(Proj_pres = Proj_pres, 
-              Proj_fut = Proj_fut, 
-              Proj_offset = Proj_offset, 
-              Proj_offset_global = Proj_offset_global, weights = weights[1:K]))
+  # return(list(Proj_pres = Proj_pres, 
+  #             Proj_fut = Proj_fut, 
+  #             Proj_offset = Proj_offset, 
+  #             Proj_offset_global = Proj_offset_global, weights = weights[1:K]))
+  return(offset_global)
 }

@@ -65,6 +65,9 @@ adaptive_index <- function(rda, K, env_pres, range = NULL, method = "loadings", 
   var_names <- row.names(rda_biplot)
   
   ## Transform environmental raster for prediction
+  if (!is.null(range)) { ## Mask with range ## TODO MOVE UP
+    env_pres <- mask(env_pres, range)
+  }
   env_crs <- crs(env_pres)
   env_df <- as.data.frame(env_pres[[var_names]], xy = TRUE)
   env_xy <- env_df[, c("x", "y")]
@@ -75,28 +78,25 @@ adaptive_index <- function(rda, K, env_pres, range = NULL, method = "loadings", 
     env_var <- as.data.frame(scale(env_var, center_env, scale_env)) ## one value only
   }
   
+  
   ## MAKE PREDICTIONS ---------------------------------------------------------
   if (method == "predict") {
     pred <- predict(rda, env_var, type = "lc")
   }
-  Proj_pres <- foreach(i = 1:K) %do%
+  Proj <- foreach(i = 1:K) %do%
     {
       if (method == "loadings") { ## Predict pixels genetic component based on RDA axes
         tmp_df <- data.frame(env_xy, z = as.vector(apply(env_var,  1, function(x) sum(x * rda_biplot[, i]))))
       } else if (method == "predict") { ## Predict with RDA model and linear combinations
         tmp_df <- data.frame(env_xy, z = as.vector(pred[, i]))
       }
-      ras_pres <- rast(tmp_df, type = "xyz", crs = crs(env_pres))
-      names(ras_pres) <- paste0("RDA", as.character(i))
-      return(ras_pres)
+      ras <- rast(tmp_df, type = "xyz", crs = crs(env_pres))
+      names(ras) <- paste0("RDA", i)
+      return(ras)
     }
-  Proj_pres <- rast(Proj_pres)
-  
-  if (!is.null(range)) { ## Mask with range
-    Proj_pres <- mask(Proj_pres, range)
-  }
+  Proj <- rast(Proj)
   
   
   ## Return predictions for each RDA axis
-  return(Proj_pres)
+  return(Proj)
 }
