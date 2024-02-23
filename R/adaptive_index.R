@@ -44,29 +44,54 @@
 
 adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 {
-  ## Checks
-  # inherits(RDA, "rda")
-  # "CCA" %in% names(RDA) ## should not be necessary ?
-  # "biplot" %in% names(RDA$CCA) ## should not be necessary ?
-  # K <= ncol(RDA$CCA$biplot)
-  # inherits(env, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # row.names(RDA_biplot) %in% names(env)
-  # method %in% c("loadings", "predict")
+  ## CHECKS -------------------------------------------------------------------
+  if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
+  if (!("CCA" %in% names(RDA)) || !("biplot" %in% names(RDA$CCA))) {
+    stop("\n RDA$CCA$biplot seems not to exist")
+  }
+  if (K > ncol(RDA$CCA$biplot)) {
+    K = ncol(RDA$CCA$biplot)
+    warning("\n Not enough RDA axis available, K is set to ncol(RDA$CCA$biplot)")
+  }
+  if (!inherits(env, c("SpatRaster", "RasterLayer", "RasterStack"))) {
+    stop("\n env must be a 'SpatRaster', 'RasterLayer' or 'RasterStack' object")
+  } else if (inherits(env, c("RasterLayer", "RasterStack"))) {
+    env <- rast(env)
+  }
+  if (nlyr(env) != nrow(RDA$CCA$biplot) || any(! names(env) %in% rownames(RDA$CCA$biplot))) {
+    stop("\n env must contain same variables as the ones used in RDA (see rownames(RDA$CCA$biplot))")
+  }
+  if (!is.null(env_mask)) {
+    if (!inherits(env_mask, c("SpatRaster", "RasterLayer"))) {
+      stop("\n env_mask must be a 'SpatRaster' or 'RasterLayer' object")
+    } else if (inherits(env_mask, "RasterLayer")) {
+      env_mask <- rast(env_mask)
+    }
+    if (nlyr(env_mask) > 1) {
+      stop("\n env_mask must contain only one layer")
+    }
+  }
+  if (!(method %in% c("loadings", "predict"))) {
+    stop("\n method must be 'loadings' or 'predict'")
+  }
   # length(scale_env) == nrow(RDA_biplot)
   # length(center_env) == nrow(RDA_biplot)
-  # names(scale_env) == row.names(RDA_biplot)
-  # names(center_env) == row.names(RDA_biplot)
-  # inherits(env_mask, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # nlyr(env_mask) == 1 ?
+  # names(scale_env) == rownames(RDA_biplot)
+  # names(center_env) == rownames(RDA_biplot)
   
+  
+  ## FUNCTION -----------------------------------------------------------------
   
   ## Get RDA informations -----------------------------------------------------
   RDA_biplot <- RDA$CCA$biplot
-  var_names <- row.names(RDA_biplot)
+  var_names <- rownames(RDA_biplot)
   
   ## Transform environmental raster for prediction
   if (!is.null(env_mask)) { ## Mask with env_mask
-    env <- mask(env, env_mask)
+    env <- try(mask(env, env_mask))
+    if (inherits(env, "try-error")) {
+      stop("\n env and env_mask must match in terms of extent, origin, crs")
+    }
   }
   env_crs <- crs(env)
   env_df <- as.data.frame(env[[var_names]], xy = TRUE)
@@ -100,3 +125,4 @@ adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings", sc
   ## Return predictions for each RDA axis
   return(Proj)
 }
+
