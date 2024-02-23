@@ -42,7 +42,8 @@
 ###################################################################################################
 
 
-adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings"
+                           , scale_env = NULL, center_env = NULL)
 {
   ## CHECKS -------------------------------------------------------------------
   if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
@@ -50,7 +51,7 @@ adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings", sc
     stop("\n RDA$CCA$biplot seems not to exist")
   }
   if (K > ncol(RDA$CCA$biplot)) {
-    K = ncol(RDA$CCA$biplot)
+    K <- ncol(RDA$CCA$biplot)
     warning("\n Not enough RDA axis available, K is set to ncol(RDA$CCA$biplot)")
   }
   if (!inherits(env, c("SpatRaster", "RasterLayer", "RasterStack"))) {

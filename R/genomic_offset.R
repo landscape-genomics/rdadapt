@@ -43,28 +43,39 @@
 ###################################################################################################
 
 
-genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = "loadings"
+                           , scale_env = NULL, center_env = NULL)
 {
-  ## Checks
-  # inherits(RDA, "rda")
-  # "CCA" %in% names(RDA) ## should not be necessary ?
-  # "eig" %in% names(RDA$CCA) ## should not be necessary ?
-  # K <= ncol(RDA$CCA$biplot)
-  # inherits(env_pres, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # names(RDA$CCA$eig) %in% names(env_pres)
-  # method %in% c("loadings", "predict")
-  # length(scale_env) == nrow(RDA_biplot)
-  # length(center_env) == nrow(RDA_biplot)
-  # names(scale_env) == row.names(RDA_biplot)
-  # names(center_env) == row.names(RDA_biplot)
-  # inherits(env_mask, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # nlyr(env_mask) == 1 ?
+  ## CHECKS -------------------------------------------------------------------
+  if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
+  if (!("CCA" %in% names(RDA)) || !("eig" %in% names(RDA$CCA))) {
+    stop("\n RDA$CCA$eig seems not to exist")
+  }
+  if (K > length(RDA$CCA$eig)) {
+    K <- length(RDA$CCA$eig)
+    warning("\n Not enough RDA axis available, K is set to length(RDA$CCA$eig)")
+  }
   
-  ## MAKE PREDICTIONS ---------------------------------------------------------
-  AI_pres <- adaptive_index(RDA, K, env_pres, env_mask, method, scale_env, center_env)
-  AI_fut <- adaptive_index(RDA, K, env_fut, env_mask, method, scale_env, center_env)
   
-  ## Single axis genetic offset 
+  ## FUNCTION -----------------------------------------------------------------
+  
+  ## Make predictions
+  AI_pres <- adaptive_index(RDA = RDA
+                            , K = K
+                            , env = env_pres
+                            , env_mask = env_mask
+                            , method = method
+                            , scale_env = scale_env
+                            , center_env = center_env)
+  AI_fut <- adaptive_index(RDA = RDA
+                           , K = K
+                           , env = env_fut
+                           , env_mask = env_mask
+                           , method = method
+                           , scale_env = scale_env
+                           , center_env = center_env)
+  
+  ## Single axis genetic offset -----------------------------------------------
   offset <- foreach(i = 1:K) %do%
     {
       ras <- abs(AI_pres[[i]] - AI_fut[[i]])
