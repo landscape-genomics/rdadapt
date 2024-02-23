@@ -6,7 +6,7 @@
 ##' 
 ##' @description This function allows the user to ...
 ##' 
-##' @param rda blabla
+##' @param RDA blabla
 ##' @param K blabla
 ##' 
 ##' @return  
@@ -39,15 +39,15 @@
 ##'
 ###################################################################################################
 
-rdadapt <- function(rda, K)
+rdadapt <- function(RDA, K)
 {
   ## Checks
-  # inherits(rda, "rda")
-  # "CCA" %in% names(rda) ## should not be necessary ?
-  # "v" %in% names(rda$CCA) ## should not be necessary ?
-  # K <= ncol(rda$CCA$v)
+  # inherits(RDA, "rda")
+  # "CCA" %in% names(RDA) ## should not be necessary ?
+  # "v" %in% names(RDA$CCA) ## should not be necessary ?
+  # K <= ncol(RDA$CCA$v)
   
-  zscores <- rda$CCA$v[, 1:as.numeric(K)]
+  zscores <- RDA$CCA$v[, 1:as.numeric(K)]
   return(rdadapt.z(zscores))
 }
 

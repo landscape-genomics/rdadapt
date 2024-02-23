@@ -42,27 +42,27 @@
 ###################################################################################################
 
 
-adaptive_index <- function(rda, K, env, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 {
   ## Checks
-  # inherits(rda, "rda")
-  # "CCA" %in% names(rda) ## should not be necessary ?
-  # "biplot" %in% names(rda$CCA) ## should not be necessary ?
-  # K <= ncol(rda$CCA$biplot)
+  # inherits(RDA, "rda")
+  # "CCA" %in% names(RDA) ## should not be necessary ?
+  # "biplot" %in% names(RDA$CCA) ## should not be necessary ?
+  # K <= ncol(RDA$CCA$biplot)
   # inherits(env, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # row.names(rda_biplot) %in% names(env)
+  # row.names(RDA_biplot) %in% names(env)
   # method %in% c("loadings", "predict")
-  # length(scale_env) == nrow(rda_biplot)
-  # length(center_env) == nrow(rda_biplot)
-  # names(scale_env) == row.names(rda_biplot)
-  # names(center_env) == row.names(rda_biplot)
+  # length(scale_env) == nrow(RDA_biplot)
+  # length(center_env) == nrow(RDA_biplot)
+  # names(scale_env) == row.names(RDA_biplot)
+  # names(center_env) == row.names(RDA_biplot)
   # inherits(env_mask, c("SpatRaster", "RasterLayer", "RasterStack"))
   # nlyr(env_mask) == 1 ?
   
   
   ## Get RDA informations -----------------------------------------------------
-  rda_biplot <- rda$CCA$biplot
-  var_names <- row.names(rda_biplot)
+  RDA_biplot <- RDA$CCA$biplot
+  var_names <- row.names(RDA_biplot)
   
   ## Transform environmental raster for prediction
   if (!is.null(env_mask)) { ## Mask with env_mask
@@ -81,12 +81,12 @@ adaptive_index <- function(rda, K, env, env_mask = NULL, method = "loadings", sc
   
   ## MAKE PREDICTIONS ---------------------------------------------------------
   if (method == "predict") {
-    pred <- predict(rda, env_var, type = "lc")
+    pred <- predict(RDA, env_var, type = "lc")
   }
   Proj <- foreach(i = 1:K) %do%
     {
       if (method == "loadings") { ## Predict pixels genetic component based on RDA axes
-        tmp_df <- data.frame(env_xy, z = as.vector(apply(env_var,  1, function(x) sum(x * rda_biplot[, i]))))
+        tmp_df <- data.frame(env_xy, z = as.vector(apply(env_var, 1, function(x) sum(x * RDA_biplot[, i]))))
       } else if (method == "predict") { ## Predict with RDA model and linear combinations
         tmp_df <- data.frame(env_xy, z = as.vector(pred[, i]))
       }

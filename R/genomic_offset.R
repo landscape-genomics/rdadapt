@@ -10,7 +10,7 @@
 ##' @param K blabla
 ##' @param env_pres blabla
 ##' @param env_fut blabla
-##' @param range (\emph{optional, default} \code{NULL}) \cr blabla
+##' @param env_mask (\emph{optional, default} \code{NULL}) \cr blabla
 ##' @param method  (\emph{default} \code{'loadings'}) \cr blabla
 ##' @param scale_env blabla
 ##' @param center_env blabla
@@ -43,27 +43,26 @@
 ###################################################################################################
 
 
-genomic_offset <- function(rda, K, env_pres, env_fut, range = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 {
   ## Checks
-  # inherits(rda, "rda")
-  # "CCA" %in% names(rda) ## should not be necessary ?
-  # "biplot" %in% names(rda$CCA) ## should not be necessary ?
-  # "eig" %in% names(rda$CCA) ## should not be necessary ?
-  # K <= ncol(rda$CCA$biplot)
+  # inherits(RDA, "rda")
+  # "CCA" %in% names(RDA) ## should not be necessary ?
+  # "eig" %in% names(RDA$CCA) ## should not be necessary ?
+  # K <= ncol(RDA$CCA$biplot)
   # inherits(env_pres, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # row.names(rda_biplot) %in% names(env_pres)
+  # names(RDA$CCA$eig) %in% names(env_pres)
   # method %in% c("loadings", "predict")
-  # length(scale_env) == nrow(rda_biplot)
-  # length(center_env) == nrow(rda_biplot)
-  # names(scale_env) == row.names(rda_biplot)
-  # names(center_env) == row.names(rda_biplot)
-  # inherits(range, c("SpatRaster", "RasterLayer", "RasterStack"))
-  # nlyr(range) == 1 ?
+  # length(scale_env) == nrow(RDA_biplot)
+  # length(center_env) == nrow(RDA_biplot)
+  # names(scale_env) == row.names(RDA_biplot)
+  # names(center_env) == row.names(RDA_biplot)
+  # inherits(env_mask, c("SpatRaster", "RasterLayer", "RasterStack"))
+  # nlyr(env_mask) == 1 ?
   
   ## MAKE PREDICTIONS ---------------------------------------------------------
-  AI_pres <- adaptive_index(rda, K, env_pres, range, method, scale_env, center_env)
-  AI_fut <- adaptive_index(rda, K, env_fut, range, method, scale_env, center_env)
+  AI_pres <- adaptive_index(RDA, K, env_pres, env_mask, method, scale_env, center_env)
+  AI_fut <- adaptive_index(RDA, K, env_fut, env_mask, method, scale_env, center_env)
   
   ## Single axis genetic offset 
   offset <- foreach(i = 1:K) %do%
@@ -75,6 +74,8 @@ genomic_offset <- function(rda, K, env_pres, env_fut, range = NULL, method = "lo
   offset <- rast(offset)
   
   ## Weight current and future adaptive indices based on eigen values of associated axes
+  weights <- RDA$CCA$eig / sum(RDA$CCA$eig)
+  weights <- weights[1:K]
   AI_pres_w <- AI_pres * weights
   AI_fut_w <- AI_fut * weights
   
