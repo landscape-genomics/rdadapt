@@ -33,25 +33,55 @@
 ##' @importFrom stats median qchisq pchisq
 ##' @importFrom robust covRob
 ##' @importFrom qvalue qvalue
+##' @importClassesFrom vegan rda
 ##' 
 ##' @export
 ##' 
 ##'
 ###################################################################################################
 
-rdadapt <- function(RDA, K)
-{
-  ## Checks
-  # inherits(RDA, "rda")
-  # "CCA" %in% names(RDA) ## should not be necessary ?
-  # "v" %in% names(RDA$CCA) ## should not be necessary ?
-  # K <= ncol(RDA$CCA$v)
-  
-  zscores <- RDA$CCA$v[, 1:as.numeric(K)]
-  return(rdadapt.z(zscores))
-}
 
-rdadapt.z <- function(zscores)
+setGeneric("rdadapt", def = function(RDA, K, zscores) { standardGeneric( "rdadapt") })
+
+##'
+##' @rdname rdadapt
+##' @export
+##'
+
+setMethod('rdadapt', signature(RDA = "rda"), function(RDA, K)
+{
+  ## CHECKS -------------------------------------------------------------------
+  if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
+  if (!("CCA" %in% names(RDA)) || !("v" %in% names(RDA$CCA))) {
+    stop("\n RDA$CCA$v seems not to exist")
+  }
+  if (K > ncol(RDA$CCA$v)) {
+    K = ncol(RDA$CCA$v)
+    warning("\n Not enough RDA axis available, K is set to ncol(RDA$CCA$v)")
+  }
+  
+  ## FUNCTION -----------------------------------------------------------------
+  zscores <- RDA$CCA$v[, 1:as.numeric(K)]
+  return(rdadapt(zscores = zscores))
+})
+
+##'
+##' @rdname rdadapt
+##' @export
+##'
+
+setMethod('rdadapt', signature(zscores = "data.frame", RDA = "missing", K = "missing"), function(zscores)
+{
+  zscores <- as.matrix(zscores)
+  return(rdadapt(zscores = zscores))
+})
+
+##'
+##' @rdname rdadapt
+##' @export
+##'
+
+setMethod('rdadapt', signature(zscores = "matrix", RDA = "missing", K = "missing"), function(zscores)
 {
   K <- ncol(zscores)
   resscale <- apply(zscores, 2, scale)
@@ -61,4 +91,5 @@ rdadapt.z <- function(zscores)
   qval <- qvalue(reschi2test)
   q.values_rdadapt <- qval$qvalues
   return(data.frame(p.values = reschi2test, q.values = q.values_rdadapt))
-}
+})
+
