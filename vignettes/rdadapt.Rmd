@@ -72,6 +72,7 @@ library(robust)
 library(ggplot2)
 library(terra)
 library(qvalue)
+library(foreach)
 ```
 
 <br>
@@ -102,7 +103,6 @@ pop <- read.csv2("../data/pop.csv", sep = ",", head = TRUE)[,-1]
 ## Get individual coordinates
 coord <- read.csv2("../data/position.csv", sep = ",", head = TRUE)[,-1]
 plot(coord, cex =.2)
-
 ```
 
 <h4>1.3. Climatic variables</h4>
@@ -285,7 +285,7 @@ $$ Where *a* is the climatic variable score (loading) along the RDA axis, *b* is
 source("../R/adaptive_index.R")
 
 ## Running the function for all pixels 
-res_RDA_proj_current <- adaptive_index(RDA = RDA_outliers, K = 2, env_pres = xx.ras.current, range = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+res_RDA_proj_current <- adaptive_index(RDA = RDA_outliers, K = 2, env = xx.ras.current, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 ```
 
 The adaptive index thus provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. When projected on a map it allows visualizing the different adaptive gradients across a species range.
@@ -334,7 +334,7 @@ Once the genetic \~ environment relationship is characterized, it can be extrapo
 source("../R/genomic_offset.R")
 
 ## Projecting the adaptive landscape after the change in environment 
-res_RDA_proj <- genomic_offset(RDA = RDA_outliers, K = 2, env_pres = xx.ras.current, env_fut = xx.ras.future, range = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+res_RDA_proj <- genomic_offset(RDA = RDA_outliers, K = 2, env_pres = xx.ras.current, env_fut = xx.ras.future, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
 
 ## Table global genetic offset predicted for 2050 and 2080
 RDA_proj_offset <- as.data.frame(res_RDA_proj$Proj_offset_global, xy = TRUE)
@@ -350,7 +350,7 @@ ggplot(data = RDA_proj_offset) +
   theme(panel.grid = element_blank(), plot.background = element_blank(), panel.background = element_blank(), strip.text = element_text(size=11))
 ```
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10}
-
+## Verifying that prediction are matching with a decline in fitness on the landscape
 diff.env <- sqrt(rowSums(as.data.frame((xx.ras.current[[1:2]] - xx.ras.future[[1:2]])^2)))
 plot(diff.env, RDA_proj_offset$Global_offset)
 fitness <- read.table("../data/fitness_futur.csv", header = T, sep = ",")
@@ -369,13 +369,13 @@ plot(log(as.data.frame(fitness.future)[,1])~RDA_proj_offset$Global_offset)
 
 <h4>6.2. Predicting geographic genomic offset</h4>
 
-A challenge associated with any predictive method is to find ways to validate the predictions. Here, we took advantage of the common garden experiment conducted in lodgepole pine to test our genomic offset predictions. We estimated a geographic genomic offset between the climate of each source population (based on the average between 1960 and 1990) and the climate of the garden where the seedlings were grown (in Vancouver, BC, Canada, averaging the years 2012 to 2015) and were then able to test the influence of the predicted genomic offset on the seedling fitness traits.
+A challenge associated with any predictive method is to find ways to validate the predictions. Here, we estimated a geographic genomic offset between the climate of each source population and the climate of a hypothetical garden (cell 1,1).
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center'}
 env <- row.names(scores(RDA_outliers, choices=c(1:2), display="bp"))
 
 ## Environmental variables for the period the seedlings were growing in the common garden (2012-2015)
-env_garden <- read.table("./Data/ClimateData_VancouverGarden.csv", sep = ",", header = T)
+env_garden <- 
 env_garden <- env_garden[, env]
 env_garden$MAR <- extract(ras_6190[[env]]$MAR, c(-123.250, 49.256))[2]
 env_garden <- as.data.frame(scale(env_garden, center = center_env[env], scale = scale_env[env]))
@@ -391,7 +391,7 @@ Based on the adaptively enriched RDA space, we estimated a distance between each
 
 ```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
 ## Function to estimate genetic offset between provenance and garden  
-source("./src/provgar_offset.R")
+source("../data/provgar_offset.R")
 
 ## Running the provenance to garden genetic offset function
 provgar_offset <- provgar_offset(RDA = RDA_outliers, K = 2, env_garden = env_garden, env_provenance = env_provenance, weights = TRUE)
@@ -399,29 +399,43 @@ provgar_offset <- provgar_offset(RDA = RDA_outliers, K = 2, env_garden = env_gar
 
 This geographic genomic offset can then be compared to different fitness traits in the garden to estimate the impact of this predicted maladaptation on seedling fitness. We can also compare the influence of genomic offset on fitness with the impact of a basic climate transfer distance estimated between each source population and the garden from the climatic variables only (using Mahalanobis distance).
 
-```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
-## Climate distance between provenances and garden
-tabmaha <- as.data.frame(rbind(env_garden, env_provenance))
-mahaclim <- mahalanobis(as.matrix(tabmaha), center = as.numeric(tabmaha[1,]), cov = cov(as.matrix(tabmaha)))
+<br>
 
-## Comparison climate transfer vs. genomic offset impact on fitness
-TAB_comp <- data.frame(x = rep(c(mahaclim[-1], provgar_offset[-1]), 2), y = c(rep(traits$Height, 2), rep(traits$GthRate, 2)), method = rep(rep(c("Climate", "Genetics"), each = nrow(traits)), 2), variable = rep(c("Final height", "Growth rate"), each = 2*nrow(traits)))
-ggplot(TAB_comp, aes(x=x, y=y)) +
-  geom_point(shape=19, size = 2, alpha = .7) +
-  geom_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1) +
-  facet_grid(variable ~ method, scales = "free") +
-  ylab("Scaled fitness trait value") + 
-  xlab("Climate transfer distance                              Genomic offset") +
-  theme_bw(base_size = 12, base_family = "Times") +
-  theme(panel.grid = element_blank(), panel.background = element_blank())
+<h2>
+
+6.  Finding covaryaing sets of individuals or loci on the RDA space
+
+    </h2>
+
+    <br>
+
+<h4>6.1. Identifying "modules" of covarying loci </h4>
+
+Blablabla
+
+```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
+## Function to find groups of loci on the RDA space
+source("../R/loci_clustering.R")
+
+## Randomly select only 20 populations
+
+loci_module(RDA = RDA_outliers, K = 2)
+
 ```
 
-```{r, message=TRUE, eval=TRUE}
-## Quadratic regression statistical testing
-summary(lm(traits$Height ~ poly(mahaclim[-1])))
-summary(lm(traits$Height ~ poly(provgar_offset[-1])))
-summary(lm(traits$GthRate ~ poly(mahaclim[-1])))
-summary(lm(traits$GthRate ~ poly(provgar_offset[-1])))
+<br>
+
+<h4>6.1. Finding groups of individuals with the same adaptive background </h4>
+
+Blablabla
+
+```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
+## Randomly select only 20 populations
+samp <- which(pop %in% sample(1:100, 20, replace = FALSE))
+
+coord.samp <- coord[samp,]
+
+points(coord.samp, col = "red", add = T)}
 ```
 
 **Notes on interpretation and best practices:** We found that genomic offset better explained the decrease in height and growth rate than the basic climate transfer distance, which confirms the great potential of genomic offset for selecting source population for management or conservation plans. As with the adaptive index (previous section), when validation data are not available, it is critical to avoid overinterpretation of genomic offset projections given that they are based on statistical associations only.
