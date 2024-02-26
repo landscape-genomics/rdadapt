@@ -50,5 +50,5 @@ loci_module <- function(RDA, K)
   find_hull <- function(df) df[chull(df$x, df$y), ]
   hulls <- ddply(df, "cluster", find_hull)
   
-  return(hulls)
+  return(list(loci = df, polygons = hulls))
 }

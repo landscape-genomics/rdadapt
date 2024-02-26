@@ -132,7 +132,6 @@ xx.ras.future <- rast(data.frame(x = rep(1:12, time = 12),
 plot(xx.ras.future)
 ```
 
-
 4.  Genotype-Environment Associations: identifying loci under selection
 
     </h2>
@@ -349,6 +348,7 @@ ggplot(data = RDA_proj_offset) +
   theme_bw(base_size = 11, base_family = "Times") +
   theme(panel.grid = element_blank(), plot.background = element_blank(), panel.background = element_blank(), strip.text = element_text(size=11))
 ```
+
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10}
 ## Verifying that prediction are matching with a decline in fitness on the landscape
 diff.env <- sqrt(rowSums(as.data.frame((xx.ras.current[[1:2]] - xx.ras.future[[1:2]])^2)))
@@ -409,23 +409,33 @@ This geographic genomic offset can then be compared to different fitness traits 
 
     <br>
 
-<h4>6.1. Identifying "modules" of covarying loci </h4>
+<h4>6.1. Identifying "modules" of covarying loci</h4>
 
 Blablabla
 
 ```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
 ## Function to find groups of loci on the RDA space
-source("../R/loci_clustering.R")
+source("../R/loci_module.R")
 
-## Randomly select only 20 populations
+## Groups the outlier loci into two modules
+modules <- loci_module(RDA = RDA_outliers, K = 2)
 
-loci_module(RDA = RDA_outliers, K = 2)
+## Visualization
+ggplot() +
+  geom_polygon(data=modules$polygons, aes(x, y, colour = factor(cluster), fill = factor(cluster)), alpha=.2) +
+  geom_point(data=modules$loci, aes(x, y, colour = factor(cluster), fill = factor(cluster)), size = 2, alpha =.7) +
+  scale_fill_viridis(discrete=TRUE, direction = -1, alpha=.2) +
+  scale_color_viridis(discrete=TRUE, direction = -1, alpha = .7) +
+  xlab("Absolute score on RDA1") + ylab("Absolute score on RDA2") +
+  facet_wrap(~"Modules of outlier loci") +
+  theme_bw(base_size = 12, base_family = "Times") +
+  theme(legend.position="none", panel.background = element_blank(), panel.grid = element_blank(), strip.text = element_text(size=12), plot.background = element_blank())
 
 ```
 
 <br>
 
-<h4>6.1. Finding groups of individuals with the same adaptive background </h4>
+<h4>6.2. Finding groups of individuals with the same adaptive background</h4>
 
 Blablabla
 
