@@ -389,13 +389,6 @@ row.names(env_provenance) <- Variables[,"Population"]
 
 Based on the adaptively enriched RDA space, we estimated a distance between each source population and the common garden climatic conditions.
 
-```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
-## Function to estimate genetic offset between provenance and garden  
-source("../data/provgar_offset.R")
-
-## Running the provenance to garden genetic offset function
-provgar_offset <- provgar_offset(RDA = RDA_outliers, K = 2, env_garden = env_garden, env_provenance = env_provenance, weights = TRUE)
-```
 
 This geographic genomic offset can then be compared to different fitness traits in the garden to estimate the impact of this predicted maladaptation on seedling fitness. We can also compare the influence of genomic offset on fitness with the impact of a basic climate transfer distance estimated between each source population and the garden from the climatic variables only (using Mahalanobis distance).
 
@@ -440,12 +433,41 @@ ggplot() +
 Blablabla
 
 ```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
-## Randomly select only 20 populations
-samp <- which(pop %in% sample(1:100, 20, replace = FALSE))
+## Randomly selects only 25 populations to mimic more what we have in our empirical datasets
+samp <- which(pop %in% sample(1:100, 25, replace = FALSE))
 
+## Subsets the datasets
 coord.samp <- coord[samp,]
+plot(coord.samp, col = "red")
+Y.samp <- Y[samp,]
+xx.current.samp <- xx.current[samp,]
+xx.future.samp <- xx.future[samp,]
 
-points(coord.samp, col = "red", add = T)}
+## New RDA model with only sample populations and outlier loci
+RDA_samp <- rda(Y.samp[,outliers] ~ .,  xx.current.samp)
+
 ```
 
-**Notes on interpretation and best practices:** We found that genomic offset better explained the decrease in height and growth rate than the basic climate transfer distance, which confirms the great potential of genomic offset for selecting source population for management or conservation plans. As with the adaptive index (previous section), when validation data are not available, it is critical to avoid overinterpretation of genomic offset projections given that they are based on statistical associations only.
+```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
+## Function to find groups of loci on the RDA space
+source("../R/adaptive_groups.R")
+
+## Groups the outlier loci into two modules
+groups <- adaptive_groups(RDA = RDA_samp, K = 2, nb_clusters = 2)
+
+## Visualization in the RDA space
+ggplot() +
+  geom_polygon(data=groups$polygons, aes(x, y, colour = factor(cluster), fill = factor(cluster)), alpha=.2) +
+  geom_point(data=groups$samples, aes(x, y, colour = factor(cluster), fill = factor(cluster)), size = 2, alpha =.7) +
+  scale_fill_viridis(discrete=TRUE, direction = -1, alpha=.2) +
+  scale_color_viridis(discrete=TRUE, direction = -1, alpha = .7) +
+  xlab("Score on RDA1") + ylab("Score on RDA2") +
+  facet_wrap(~"Adaptive groups") +
+  theme_bw(base_size = 12, base_family = "Times") +
+  theme(legend.position="none", panel.background = element_blank(), panel.grid = element_blank(), strip.text = element_text(size=12), plot.background = element_blank())
+
+## Visualization on the landscape
+tab <- data.frame(coord.samp, cluster = groups$samples$cluster)
+plot(tab[,1:2], col = tab$cluster)
+
+```
