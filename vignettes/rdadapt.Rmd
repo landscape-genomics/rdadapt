@@ -270,7 +270,7 @@ RDA_outliers <- rda(Y[,outliers] ~ .,  xx.current)
 
 An RDA biplot allows us to visualize the relationship between the 91 putative adaptive loci and the underlying climatic variables.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center'}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 3, fig.width= 3}
 ## RDA biplot
 TAB_loci <- as.data.frame(scores(RDA_outliers, choices=c(1:2), display="species", scaling="none"))
 TAB_var <- as.data.frame(scores(RDA_outliers, choices=c(1:2), display="bp"))
@@ -387,7 +387,7 @@ plot(log(as.data.frame(fitness.future)[,1])~RDA_proj_offset$Global_offset)
 
 A challenge associated with any predictive method is to find ways to validate the predictions. Here, we estimated a geographic genomic offset between the climate of each source population and the climate of a hypothetical garden (cell 1,1).
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center'}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 3.5, fig.width= 9}
 ## Estimates genomic offset for specific populations
 offset_samp <- genomic_offset(RDA = RDA_outliers, K = 2, env_pres = xx.current.samp, env_fut = xx.future.samp, method = "loadings")
 
@@ -402,7 +402,7 @@ ggplot() +
   theme_bw(base_size = 12, base_family = "Times") +
   theme(panel.background = element_blank(), panel.grid = element_blank(), strip.text = element_text(size=12), plot.background = element_blank())
 ```
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center'}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 3.5, fig.width= 9}
 ## Estimates genomic offset for a transplantation experiment
 offset_gar <- genomic_offset(RDA = RDA_outliers, K = 2, env_pres = xx.current, env_gar = xx.current[100,], method = "loadings")
 
@@ -411,7 +411,7 @@ table <- data.frame(coord, offset_gar$genomic_offset)
 table <- melt(table, id.vars = c("x","y"))
 ggplot() +
   geom_point(data=table, aes(x, y, color = value)) +
-  geom_point(data=coord[100,], aes(x, y), colour = "red", size =2) +
+  geom_point(data=coord[100,], aes(x, y), colour = "black", size = 3, shape = 4) +
   scale_color_viridis(direction = -1, alpha=.8, option = "magma") +
   labs(color = "Genomic offset") +
   facet_wrap(~variable) +
