@@ -41,14 +41,14 @@
 ##'
 ###################################################################################################
 
-setGeneric("adaptive_groups", def = function(RDA, K, env_pres, nb_clusters) { standardGeneric( "adaptive_groups") })
+setGeneric("adaptive_groups", def = function(RDA, K, env, nb_clusters) { standardGeneric( "adaptive_groups") })
 
 ##'
 ##' @rdname adaptive_groups
 ##' @export
 ##'
 
-setMethod('adaptive_groups', signature(RDA = "rda", env_pres = "missing"), function(RDA, K, nb_clusters)
+setMethod('adaptive_groups', signature(RDA = "rda", env = "missing"), function(RDA, K, nb_clusters)
 {
   ## CHECKS -------------------------------------------------------------------
   if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
@@ -75,84 +75,44 @@ setMethod('adaptive_groups', signature(RDA = "rda", env_pres = "missing"), funct
   return(list(samples = df, polygons = hulls))
 })
 
-# ##'
-# ##' @rdname adaptive_groups
-# ##' @export
-# ##'
-# 
-# setMethod('adaptive_groups', signature(RDA = "rda", env_pres = "raster"), function(RDA, K, env_pres, nb_clusters)
-# {
-#   ## CHECKS -------------------------------------------------------------------
-#   if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
-#   if (K > ncol(RDA$CCA$v)) {
-#     K = ncol(RDA$CCA$v)
-#     warning("\n Not enough RDA axis available, K is set to ncol(RDA$CCA$v)")
-#   }
-#   
-#   ## FUNCTION -----------------------------------------------------------------
-#   
-#   ## Make predictions
-#   AI_pres <- adaptive_index(RDA = RDA
-#                             , K = K
-#                             , env = env_pres
-#                             , env_mask = NULL
-#                             , method = "loadings")
-#   
-#   # RDA1 and RDA2 scores for all the pixels of the range
-#   tmp_df <- data.frame(x = rasterToPoints(res_RDA_proj_current$RDA1)[, 1]
-#                     , y = rasterToPoints(res_RDA_proj_current$RDA1)[, 2]
-#                     , RDA1 = rasterToPoints(res_RDA_proj_current$RDA1)[, 3]
-#                     , RDA2 = rasterToPoints(res_RDA_proj_current$RDA2)[, 3])
-#   
-#   ## Hierarchical K-means clustering with K number of clusters
-#   clust <- hkmeans(x = tmp_df
-#                    , k = nb_clusters
-#                    , hc.metric = "euclidean"
-#                    , hc.method = "ward.D2"
-#                    , iter.max = 10
-#                    , km.algorithm = "Hartigan-Wong")
-#   
-# 
-#   return(clusterNA)
-# })
-# 
-# 
-# adaptive_groups <- function(RDA, K)
-# {
-#   # RDA1 and RDA2 scores for all the pixels of the range
-#   TAB <- data.frame(x = rasterToPoints(res_RDA_proj_current$RDA1)[, 1]
-#                     , y = rasterToPoints(res_RDA_proj_current$RDA1)[, 2]
-#                     , RDA1 = rasterToPoints(res_RDA_proj_current$RDA1)[, 3]
-#                     , RDA2 = rasterToPoints(res_RDA_proj_current$RDA2)[, 3])
-#   
-#   # Hierarchical K-means clustering
-#   TAB_sample <- TAB[, 3:4]
-#   clust <- list()
-#   for (i in 1:15) {
-#     clust[[i]] <- hkmeans(x = TAB_sample, k = i, hc.metric = "euclidean"
-#                           , hc.method = "ward.D2", iter.max = 10, km.algorithm = "Hartigan-Wong")
-#   }
-#   
-#   # Select the best number of clusters
-#   within_cust_var <- lapply(clust, function(x) x$withinss / x$totss)
-#   plot(unlist(lapply(within_cust_var, mean)))
-#   
-#   # Extrapolate the clustering to all the pixels with 4 clusters
-#   df <- data.frame(x = TAB_sample$RDA1, y = TAB_sample$RDA2, cluster = clust[[4]]$cluster) 
-#   find_hull <- function(df) df[chull(df$x, df$y), ]
-#   hulls <- ddply(df, "cluster", find_hull) # Convex hulls.
-#   cluster <- rep(NA, nrow(TAB))
-#   for (i in 1:4) {
-#     inhull <- inhulln(convhulln(hulls[hulls$cluster == i, 1:2])
-#                       , as.matrix(TAB[, 3:4])) # Intersection convex hulls and points
-#     cluster[inhull] <- i
-#   }
-#   clusterNA <- cluster[which(is.na(cluster))]
-#   for (i in 1:length(clusterNA)) {
-#     clusterNA[i] <- which.min(pointDistance(TAB[which(is.na(cluster))[i], 3:4]
-#                                             , clust[[4]]$centers, lonlat = FALSE)) # Fill the NA using the distance to the hull centers
-#   }
-#   cluster[which(is.na(cluster))] <- clusterNA
-#   
-#   return(clusterNA)
-# }
+##'
+##' @rdname adaptive_groups
+##' @export
+##'
+
+setMethod('adaptive_groups', signature(RDA = "rda", env = "SpatRaster"), function(RDA, K, env, nb_clusters)
+{
+  ## CHECKS -------------------------------------------------------------------
+
+  # @Maya Do we need to check again if adaptive_index below does it anyway?
+
+  ## FUNCTION -----------------------------------------------------------------
+
+  ## Make predictions
+  AI_pres <- adaptive_index(RDA = RDA
+                            , K = K
+                            , env = env
+                            , env_mask = NULL
+                            , method = "loadings")
+
+  # RDA1 and RDA2 scores for all the pixels of the range
+  tmp_df <- data.frame(x = as.data.frame(AI_pres$RDA1, xy = TRUE)[, 1]
+                    , y = as.data.frame(AI_pres$RDA1, xy = TRUE)[, 2]
+                    , RDA1 = as.data.frame(AI_pres$RDA1, xy = TRUE)[, 3]
+                    , RDA2 = as.data.frame(AI_pres$RDA2, xy = TRUE)[, 3])
+
+  ## Hierarchical K-means clustering with K number of clusters
+  clusters <- hkmeans(x = tmp_df
+                   , k = nb_clusters
+                   , hc.metric = "euclidean"
+                   , hc.method = "ward.D2"
+                   , iter.max = 10
+                   , km.algorithm = "Hartigan-Wong")
+
+  # Convex hulls
+  tmp_df$cluster <- clusters$cluster
+  find_hull <- function(tmp_df) tmp_df[chull(tmp_df$x, tmp_df$y), ]
+  hulls <- ddply(tmp_df, "cluster", find_hull)
+
+  return(list(samples = tmp_df, polygons = hulls, variance_within = clusters$withinss/clusters$totss))
+})

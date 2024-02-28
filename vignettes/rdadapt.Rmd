@@ -73,6 +73,9 @@ library(ggplot2)
 library(terra)
 library(qvalue)
 library(foreach)
+library(plyr)
+library(viridis)
+library(factoextra)
 ```
 
 <br>
@@ -372,19 +375,19 @@ plot(log(as.data.frame(fitness.future)[,1])~RDA_proj_offset$Global_offset)
 A challenge associated with any predictive method is to find ways to validate the predictions. Here, we estimated a geographic genomic offset between the climate of each source population and the climate of a hypothetical garden (cell 1,1).
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center'}
-env <- row.names(scores(RDA_outliers, choices=c(1:2), display="bp"))
-
-## Environmental variables for the period the seedlings were growing in the common garden (2012-2015)
-env_garden <- 
-env_garden <- env_garden[, env]
-env_garden$MAR <- extract(ras_6190[[env]]$MAR, c(-123.250, 49.256))[2]
-env_garden <- as.data.frame(scale(env_garden, center = center_env[env], scale = scale_env[env]))
-env_garden <- colMeans(env_garden)
-
-## Environmental variables for the source populations between 61 and 90
-env_provenance <- data.frame(extract(ras_6190[[env]], Variables[,c("Longitude", "Latitude")]))
-env_provenance <- as.data.frame(scale(env_provenance, center_env[env], scale_env[env]))
-row.names(env_provenance) <- Variables[,"Population"]
+# env <- row.names(scores(RDA_outliers, choices=c(1:2), display="bp"))
+# 
+# ## Environmental variables for the period the seedlings were growing in the common garden (2012-2015)
+# env_garden <- 
+# env_garden <- env_garden[, env]
+# env_garden$MAR <- extract(ras_6190[[env]]$MAR, c(-123.250, 49.256))[2]
+# env_garden <- as.data.frame(scale(env_garden, center = center_env[env], scale = scale_env[env]))
+# env_garden <- colMeans(env_garden)
+# 
+# ## Environmental variables for the source populations between 61 and 90
+# env_provenance <- data.frame(extract(ras_6190[[env]], Variables[,c("Longitude", "Latitude")]))
+# env_provenance <- as.data.frame(scale(env_provenance, center_env[env], scale_env[env]))
+# row.names(env_provenance) <- Variables[,"Population"]
 ```
 
 Based on the adaptively enriched RDA space, we estimated a distance between each source population and the common garden climatic conditions.
@@ -452,7 +455,7 @@ RDA_samp <- rda(Y.samp[,outliers] ~ .,  xx.current.samp)
 ## Function to find groups of loci on the RDA space
 source("../R/adaptive_groups.R")
 
-## Groups the outlier loci into two modules
+## Finds N optimal groups among the individuals used to build the adaptive RDA space
 groups <- adaptive_groups(RDA = RDA_samp, K = 2, nb_clusters = 2)
 
 ## Visualization in the RDA space
@@ -469,5 +472,22 @@ ggplot() +
 ## Visualization on the landscape
 tab <- data.frame(coord.samp, cluster = groups$samples$cluster)
 plot(tab[,1:2], col = tab$cluster)
+
+```
+
+```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
+## Finds N groups on the adaptive landscape projected from the RDA model
+groups <- adaptive_groups(RDA = RDA_samp, K = 2, env = xx.ras.current, nb_clusters = 4)
+
+## Visualization in the RDA space
+ggplot() +
+  geom_polygon(data=groups$polygons, aes(x, y, colour = factor(cluster), fill = factor(cluster)), alpha=.2) +
+  geom_point(data=groups$samples, aes(x, y, colour = factor(cluster), fill = factor(cluster)), size = 2, alpha =.7) +
+  scale_fill_viridis(discrete=TRUE, direction = -1, alpha=.2) +
+  scale_color_viridis(discrete=TRUE, direction = -1, alpha = .7) +
+  xlab("Score on RDA1") + ylab("Score on RDA2") +
+  facet_wrap(~"Adaptive groups") +
+  theme_bw(base_size = 12, base_family = "Times") +
+  theme(legend.position="none", panel.background = element_blank(), panel.grid = element_blank(), strip.text = element_text(size=12), plot.background = element_blank())
 
 ```
