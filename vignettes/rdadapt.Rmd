@@ -76,6 +76,7 @@ library(foreach)
 library(plyr)
 library(viridis)
 library(factoextra)
+library(reshape2)
 ```
 
 <br>
@@ -411,14 +412,14 @@ table <- melt(table, id.vars = c("x","y"))
 ggplot() +
   geom_point(data=table, aes(x, y, color = value)) +
   geom_point(data=coord[100,], aes(x, y), colour = "red", size =2) +
-  scale_color_viridis(direction = -1, alpha=.8) +
+  scale_color_viridis(direction = -1, alpha=.8, option = "magma") +
   labs(color = "Genomic offset") +
   facet_wrap(~variable) +
   theme_bw(base_size = 12, base_family = "Times") +
   theme(panel.background = element_blank(), panel.grid = element_blank(), strip.text = element_text(size=12), plot.background = element_blank())
 ```
 
-Based on the adaptively enriched RDA space, we estimated a distance between each source population and the common garden climatic conditions.
+Based on the adaptively enriched RDA space, we estimated a genomic offset between each source individual and the common garden climatic conditions.
 
 
 This geographic genomic offset can then be compared to different fitness traits in the garden to estimate the impact of this predicted maladaptation on seedling fitness. We can also compare the influence of genomic offset on fitness with the impact of a basic climate transfer distance estimated between each source population and the garden from the climatic variables only (using Mahalanobis distance).
