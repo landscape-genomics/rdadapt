@@ -41,8 +41,14 @@
 ##'
 ###################################################################################################
 
+setGeneric("adaptive_index", def = function(RDA, K, env, env_mask = NULL, method = "loadings") { standardGeneric("adaptive_index") })
 
-adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings")
+##'
+##' @rdname adaptive_index
+##' @export
+##'
+
+setMethod('adaptive_index', signature(RDA = "rda", env = "SpatRaster"), function(RDA, K, env, env_mask = NULL, method = "loadings")
 {
   ## CHECKS -------------------------------------------------------------------
   if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
@@ -78,7 +84,7 @@ adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings")
   
   ## FUNCTION -----------------------------------------------------------------
   
-  ## Get RDA informations -----------------------------------------------------
+  ## GET RDA INFORMATION -----------------------------------------------------
   RDA_biplot <- RDA$CCA$biplot
   var_names <- rownames(RDA_biplot)
   
@@ -112,8 +118,58 @@ adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings")
     }
   Proj <- rast(Proj)
   
-  
   ## Return predictions for each RDA axis
   return(Proj)
-}
+})
 
+
+##'
+##' @rdname adaptive_index
+##' @export
+##'
+
+setMethod('adaptive_index', signature(RDA = "rda", env = "data.frame"), function(RDA, K, env, method = "loadings")
+{
+  ## CHECKS -------------------------------------------------------------------
+  if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
+  if (!("CCA" %in% names(RDA)) || !("biplot" %in% names(RDA$CCA))) {
+    stop("\n RDA$CCA$biplot seems not to exist")
+  }
+  if (K > ncol(RDA$CCA$biplot)) {
+    K <- ncol(RDA$CCA$biplot)
+    warning("\n Not enough RDA axis available, K is set to ncol(RDA$CCA$biplot)")
+  }
+  if (nlyr(env) != nrow(RDA$CCA$biplot) || any(! names(env) %in% rownames(RDA$CCA$biplot))) {
+    stop("\n env must contain same variables as the ones used in RDA (see rownames(RDA$CCA$biplot))")
+  }
+  if (!(method %in% c("loadings", "predict"))) {
+    stop("\n method must be 'loadings' or 'predict'")
+  }
+  
+  
+  ## FUNCTION -----------------------------------------------------------------
+  
+  ## GET RDA INFORMATION -----------------------------------------------------
+  RDA_biplot <- RDA$CCA$biplot
+  var_names <- rownames(RDA_biplot)
+  env_var <- env[, var_names]
+  
+  ## MAKE PREDICTIONS ---------------------------------------------------------
+  if (method == "predict") {
+    pred <- predict(RDA, env_var, type = "lc")
+  }
+  AI <- foreach(i = 1:K) %do%
+    {
+      if (method == "loadings") { ## Predict genetic component based on RDA axes
+        tmp_vec <- as.vector(apply(env_var, 1, function(x) sum(x * RDA_biplot[, i])))
+      } else if (method == "predict") { ## Predict with RDA model and linear combinations
+        tmp_vec <- as.vector(pred[, i])
+      }
+      return(tmp_vec)
+    }
+  names(AI) <- paste0("RDA", 1:K)
+  AI <- as.data.frame(do.call(cbind, AI))
+  
+  ## Return predictions for each RDA axis
+  return(AI)
+})

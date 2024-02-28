@@ -40,8 +40,14 @@
 ##'
 ###################################################################################################
 
+setGeneric("genomic_offset", def = function(RDA, K, env_pres, env_fut, env_mask = NULL, method = "loadings") { standardGeneric( "genomic_offset") })
 
-genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = "loadings")
+##'
+##' @rdname genomic_offset
+##' @export
+##'
+
+setMethod('genomic_offset', signature(RDA = "rda", env_pres = "SpatRaster"), function(RDA, K, env_pres, env_fut, env_mask = NULL, method = "loadings")
 {
   ## CHECKS -------------------------------------------------------------------
   if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
@@ -52,7 +58,6 @@ genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = 
     K <- length(RDA$CCA$eig)
     warning("\n Not enough RDA axis available, K is set to length(RDA$CCA$eig)")
   }
-  
   
   ## FUNCTION -----------------------------------------------------------------
   
@@ -97,4 +102,65 @@ genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = 
               Proj_offset = offset,
               Proj_offset_global = offset_global,
               weights = weights))
-}
+})
+
+
+##'
+##' @rdname genomic_offset
+##' @export
+##'
+
+setMethod('genomic_offset', signature(RDA = "rda", env_pres = "data.frame", env_mask = "missing"), function(RDA, K, env_pres, env_fut, method = "loadings")
+{
+  ## CHECKS -------------------------------------------------------------------
+  if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
+  if (!("CCA" %in% names(RDA)) || !("eig" %in% names(RDA$CCA))) {
+    stop("\n RDA$CCA$eig seems not to exist")
+  }
+  if (K > length(RDA$CCA$eig)) {
+    K <- length(RDA$CCA$eig)
+    warning("\n Not enough RDA axis available, K is set to length(RDA$CCA$eig)")
+  }
+  
+  ## FUNCTION -----------------------------------------------------------------
+  
+  ## Make predictions
+  AI_pres <- adaptive_index(RDA = RDA
+                            , K = K
+                            , env = env_pres
+                            , method = method)
+  AI_fut <- adaptive_index(RDA = RDA
+                           , K = K
+                           , env = env_fut
+                           , method = method)
+  
+  ## Single axis genetic offset -----------------------------------------------
+  offset <- foreach(i = 1:K) %do%
+    {
+      ras <- abs(AI_pres[[i]] - AI_fut[[i]])
+      names(ras) <- paste0("RDA", i)
+      return(ras)
+    }
+  offset <- rast(offset)
+  
+  ## Weight current and future adaptive indices based on eigen values of associated axes
+  weights <- RDA$CCA$eig / sum(RDA$CCA$eig)
+  weights <- weights[1:K]
+  AI_pres_w <- AI_pres * weights
+  AI_fut_w <- AI_fut * weights
+  
+  ## Predict a global genetic offset
+  offset_global <- offset[[1]]
+  offset_global[!is.na(offset_global)] <- sapply(1:ncell(AI_pres_w), function(x) {
+    tmp_mat <- rbind(AI_pres_w[x], AI_fut_w[x])
+    return(dist(tmp_mat, method = "euclidean"))
+  })
+  names(offset_global) <- "Global_offset"
+  
+  
+  return(list(Proj_pres = AI_pres,
+              Proj_fut = AI_fut,
+              Proj_offset = offset,
+              Proj_offset_global = offset_global,
+              weights = weights))
+})
