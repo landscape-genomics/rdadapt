@@ -84,7 +84,7 @@ setMethod('adaptive_index', signature(RDA = "rda", env = "SpatRaster"), function
   
   ## FUNCTION -----------------------------------------------------------------
   
-  ## GET RDA INFORMATION -----------------------------------------------------
+  ## Get RDA information -----------------------------------------------------
   RDA_biplot <- RDA$CCA$biplot
   var_names <- rownames(RDA_biplot)
   
@@ -101,7 +101,7 @@ setMethod('adaptive_index', signature(RDA = "rda", env = "SpatRaster"), function
   env_var <- env_df[, var_names]
   
   
-  ## MAKE PREDICTIONS ---------------------------------------------------------
+  ## Make predictions ---------------------------------------------------------
   if (method == "predict") {
     pred <- predict(RDA, env_var, type = "lc")
   }
@@ -128,7 +128,7 @@ setMethod('adaptive_index', signature(RDA = "rda", env = "SpatRaster"), function
 ##' @export
 ##'
 
-setMethod('adaptive_index', signature(RDA = "rda", env = "data.frame"), function(RDA, K, env, method = "loadings")
+setMethod('adaptive_index', signature(RDA = "rda", env = "data.frame", env_mask = "missing"), function(RDA, K, env, method = "loadings")
 {
   ## CHECKS -------------------------------------------------------------------
   if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
@@ -139,7 +139,7 @@ setMethod('adaptive_index', signature(RDA = "rda", env = "data.frame"), function
     K <- ncol(RDA$CCA$biplot)
     warning("\n Not enough RDA axis available, K is set to ncol(RDA$CCA$biplot)")
   }
-  if (nlyr(env) != nrow(RDA$CCA$biplot) || any(! names(env) %in% rownames(RDA$CCA$biplot))) {
+  if (ncol(env) != nrow(RDA$CCA$biplot) || any(! colnames(env) %in% rownames(RDA$CCA$biplot))) {
     stop("\n env must contain same variables as the ones used in RDA (see rownames(RDA$CCA$biplot))")
   }
   if (!(method %in% c("loadings", "predict"))) {
@@ -149,12 +149,12 @@ setMethod('adaptive_index', signature(RDA = "rda", env = "data.frame"), function
   
   ## FUNCTION -----------------------------------------------------------------
   
-  ## GET RDA INFORMATION -----------------------------------------------------
+  ## Get RDA information -----------------------------------------------------
   RDA_biplot <- RDA$CCA$biplot
   var_names <- rownames(RDA_biplot)
   env_var <- env[, var_names]
   
-  ## MAKE PREDICTIONS ---------------------------------------------------------
+  ## Make predictions ---------------------------------------------------------
   if (method == "predict") {
     pred <- predict(RDA, env_var, type = "lc")
   }
