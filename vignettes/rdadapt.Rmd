@@ -287,7 +287,7 @@ $$ Where *a* is the climatic variable score (loading) along the RDA axis, *b* is
 source("../R/adaptive_index.R")
 
 ## Running the function for all pixels 
-res_RDA_proj_current <- adaptive_index(RDA = RDA_outliers, K = 2, env = xx.ras.current, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+res_RDA_proj_current <- adaptive_index(RDA = RDA_outliers, K = 2, env = xx.ras.current, env_mask = NULL, method = "loadings")
 ```
 
 The adaptive index thus provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. When projected on a map it allows visualizing the different adaptive gradients across a species range.
@@ -336,7 +336,7 @@ Once the genetic \~ environment relationship is characterized, it can be extrapo
 source("../R/genomic_offset.R")
 
 ## Projecting the adaptive landscape after the change in environment 
-res_RDA_proj <- genomic_offset(RDA = RDA_outliers, K = 2, env_pres = xx.ras.current, env_fut = xx.ras.future, env_mask = NULL, method = "loadings", scale_env = NULL, center_env = NULL)
+res_RDA_proj <- genomic_offset(RDA = RDA_outliers, K = 2, env_pres = xx.ras.current, env_fut = xx.ras.future, env_mask = NULL, method = "loadings")
 
 ## Table global genetic offset predicted for 2050 and 2080
 RDA_proj_offset <- as.data.frame(res_RDA_proj$Proj_offset_global, xy = TRUE)

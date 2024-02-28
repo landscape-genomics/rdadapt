@@ -12,8 +12,6 @@
 ##' @param env_fut blabla
 ##' @param env_mask (\emph{optional, default} \code{NULL}) \cr blabla
 ##' @param method  (\emph{default} \code{'loadings'}) \cr blabla
-##' @param scale_env blabla
-##' @param center_env blabla
 ##' 
 ##' 
 ##' @return  
@@ -43,8 +41,7 @@
 ###################################################################################################
 
 
-genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = "loadings"
-                           , scale_env = NULL, center_env = NULL)
+genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = "loadings")
 {
   ## CHECKS -------------------------------------------------------------------
   if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
@@ -64,16 +61,12 @@ genomic_offset <- function(RDA, K, env_pres, env_fut, env_mask = NULL, method = 
                             , K = K
                             , env = env_pres
                             , env_mask = env_mask
-                            , method = method
-                            , scale_env = scale_env
-                            , center_env = center_env)
+                            , method = method)
   AI_fut <- adaptive_index(RDA = RDA
                            , K = K
                            , env = env_fut
                            , env_mask = env_mask
-                           , method = method
-                           , scale_env = scale_env
-                           , center_env = center_env)
+                           , method = method)
   
   ## Single axis genetic offset -----------------------------------------------
   offset <- foreach(i = 1:K) %do%

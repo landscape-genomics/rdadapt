@@ -42,8 +42,7 @@
 ###################################################################################################
 
 
-adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings"
-                           , scale_env = NULL, center_env = NULL)
+adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings")
 {
   ## CHECKS -------------------------------------------------------------------
   if (!inherits(RDA, "rda")) { stop("\n RDA must be a 'rda' object") }
@@ -75,10 +74,6 @@ adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings"
   if (!(method %in% c("loadings", "predict"))) {
     stop("\n method must be 'loadings' or 'predict'")
   }
-  # length(scale_env) == nrow(RDA_biplot)
-  # length(center_env) == nrow(RDA_biplot)
-  # names(scale_env) == rownames(RDA_biplot)
-  # names(center_env) == rownames(RDA_biplot)
   
   
   ## FUNCTION -----------------------------------------------------------------
@@ -98,11 +93,6 @@ adaptive_index <- function(RDA, K, env, env_mask = NULL, method = "loadings"
   env_df <- as.data.frame(env[[var_names]], xy = TRUE)
   env_xy <- env_df[, c("x", "y")]
   env_var <- env_df[, var_names]
-  
-  if (!(is.null(scale_env) & is.null(center_env))) { ## Standardize environmental variables
-    # env_var <- as.data.frame(scale(env_var, center_env[var_names], scale_env[var_names])) ## MARCHE PAS
-    env_var <- as.data.frame(scale(env_var, center_env, scale_env)) ## one value only
-  }
   
   
   ## MAKE PREDICTIONS ---------------------------------------------------------
