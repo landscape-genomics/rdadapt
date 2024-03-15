@@ -20,7 +20,7 @@ Depends:
 Imports:
     stats, vegan, terra, qvalue, foreach, plyr
 License: GPL-3
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Encoding: UTF-8
 VignetteBuilder: knitr
 LazyData: true
