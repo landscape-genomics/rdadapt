@@ -1,0 +1,26 @@
+Package: rdadapt
+Type: Package
+Title: Blabla
+Version: 1.0.0
+Date: 2024-03-15
+Authors@R: c(person("Thibaut", "Capblancq", role = c("aut", "cre")
+                    , email = "thibaut.capblancq@univ-grenoble-alpes.fr"),
+             person("Maya", "Gueguen", role = c("aut")
+                    , email = "maya.gueguen@univ-grenoble-alpes.fr"))
+Author: Thibaut Capblancq [aut, cre],
+    Maya Gueguen [aut]
+Maintainer: Thibaut Capblancq <thibaut.capblancq@univ-grenoble-alpes.fr>
+Contact: Thibaut Capblancq <thibaut.capblancq@univ-grenoble-alpes.fr>, 
+    Maya Gueguen <maya.gueguen@univ-grenoble-alpes.fr>
+BugReports: https://github.com/landscape-genomics/rdadapt/issues
+URL: https://landscape-genomics.github.io/rdadapt/
+Description: Functions 
+Depends:
+    R (>= 4.1)
+Imports:
+    stats, vegan, terra, qvalue, foreach, plyr
+License: GPL-3
+RoxygenNote: 7.2.3
+Encoding: UTF-8
+VignetteBuilder: knitr
+LazyData: true
