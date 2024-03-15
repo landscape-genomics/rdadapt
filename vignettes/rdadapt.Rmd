@@ -438,7 +438,7 @@ This geographic genomic offset can then be compared to different fitness traits 
 
 Blablabla
 
-```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
+```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center', fig.align='center', fig.height = 3.5, fig.width= 5}
 ## Function to find groups of loci on the RDA space
 source("../R/loci_module.R")
 
@@ -494,7 +494,7 @@ plot(tab[,1:2], col = tab$cluster)
 
 ```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
 ## Finds N groups on the adaptive landscape projected from the RDA model
-groups <- adaptive_groups(RDA = RDA_samp, K = 2, env = xx.ras.current, nb_clusters = 4)
+groups <- adaptive_groups(RDA = RDA_samp, K = 2, env = xx.ras.current, nb_clusters = 9)
 
 ## Visualization in the RDA space
 ggplot() +
