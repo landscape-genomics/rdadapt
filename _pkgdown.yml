@@ -1,14 +1,16 @@
 authors:
-  Wilfried Thuiller:
-    href: http://www.will.chez-alice.fr/
+  Thibaut Capblancq:
+    href: https://scholar.google.fr/citations?user=BuqUlRcAAAAJ&hl=fr&oi=ao
   Maya Gueguen:
     href: https://mayagueguen.github.io
+  Bren Forester:
+    href: https://brenna-forester.weebly.com
 
 navbar:
   structure:
     left:
     - home
-    - examples
+    - tutorial
     - reference
     right:
     - news
@@ -17,29 +19,10 @@ navbar:
     home:
       icon: fa-home fa-lg
       href: index.html
-    videos:
-      text: Videos
-      icon: fas fa-video
-      href: articles/vignette_videos.html
-    examples:
-      text: Examples
+    tutorial:
+      text: tutorial
       icon: fas fa-stethoscope
-      menu:
-        - text: Main functions
-          href: articles/examples_1_mainFunctions.html
-        - text: Secundary functions
-          href: articles/examples_2_secundaryFunctions.html
-        - text: "---------"
-        - text: Data preparation
-          href: articles/vignette_dataPreparation.html
-        - text: Pseudo-absences
-          href: articles/vignette_pseudoAbsences.html
-        - text: Cross-validation
-          href: articles/vignette_crossValidation.html
-        - text: Modeling options
-          href: articles/vignette_modelingOptions.html
-        - text: Variability in results
-          href: articles/vignette_variability.html
+      href: vignette_tutorial.html
     reference:
       text: Reference
       icon: fa-book fa-lg
@@ -50,72 +33,24 @@ navbar:
       href: articles/news.html
     github:
       icon: fa-github fa-lg
-      href: https://github.com/biomodhub/biomod2.git
+      href: https://github.com/landscape-genomics/rdadapt
 
+tutorial:
+      title: Landscape genomics analyses based on RDA models
+        contents: 
+          - "Data Preparation"
+          - "Genome Scan"
+          - "Adaptive Index"
+          - "Genomic Offset"
+          - "Loci Modules"
+          - "Adaptive Groups"
 
 reference:
-  - title: Modeling species distributions
-  - subtitle: Main functions
+  - title: All functions
     contents:
-      - "BIOMOD_FormatingData"
-      - "BIOMOD_Modeling"
-      - "BIOMOD_Projection"
-      - "BIOMOD_EnsembleModeling"
-      - "BIOMOD_EnsembleForecasting"
-      - "BIOMOD_RangeSize"
-      - "BIOMOD_LoadModels"
-  - subtitle: Secundary functions
-    contents:
-      - "bm_MakeFormula"
-      - "bm_SampleBinaryVector"
-      - "bm_SampleFactorLevels"
-      - "bm_PseudoAbsences"
-      - "bm_CrossValidation"
-      - "bm_ModelingOptions"
-      - "bm_Tuning"
-      - "bm_RunModelsLoop"
-      - "bm_SRE"
-      - "bm_FindOptimStat"
-      - "bm_BinaryTransformation"
-      - "bm_VariablesImportance"
-      - "bm_PlotEvalMean"
-      - "bm_PlotEvalBoxplot"
-      - "bm_PlotVarImpBoxplot"
-      - "bm_PlotResponseCurves"
-      - "bm_PlotRangeSize"
-  - title: Toolbox
-  - subtitle: Objects
-    contents:
-      - "BIOMOD.formated.data"
-      - "BIOMOD.formated.data.PA"
-      - "plot,BIOMOD.formated.data,missing-method"
-      - "summary,BIOMOD.formated.data-method"
-      - "BIOMOD.options.default"
-      - "BIOMOD.options.dataset"
-      - "BIOMOD.models.options"
-      - "BIOMOD.stored.data"
-      - "biomod2_model"
-      - "biomod2_ensemble_model"
-      - "BIOMOD.models.out"
-      - "BIOMOD.projection.out"
-      - "BIOMOD.ensemble.models.out"
-  - subtitle: Getters
-    contents:
-      - "load_stored_object"
-      - "getters.bm"
-      - "getters.out"
-      - "predict.bm"
-      - "predict.em"
-  - title: Data
-  - subtitle: Models options
-    contents:
-      - "ModelsTable"
-      - "OptionsBigboss"
-  - subtitle: Species data
-    contents:
-      - "DataSpecies"
-  - subtitle: Environmental data
-    contents:
-      - "bioclim_current"
-      - "bioclim_future"
+      - "rdadapt"
+      - "adaptive_index"
+      - "genomic_offset"
+      - "loci_modules"
+      - "adaptive_groups"
 
