@@ -4,7 +4,7 @@
 \alias{adaptive_index}
 \alias{adaptive_index,rda,ANY,SpatRaster,ANY-method}
 \alias{adaptive_index,rda,ANY,data.frame,missing-method}
-\title{Adaptive index}
+\title{Project adaptive variation across space onto current or future landscape}
 \usage{
 adaptive_index(RDA, K, env, env_mask = NULL, method = "loadings")
 
@@ -13,29 +13,26 @@ adaptive_index(RDA, K, env, env_mask = NULL, method = "loadings")
 \S4method{adaptive_index}{rda,ANY,data.frame,missing}(RDA, K, env, method = "loadings")
 }
 \arguments{
-\item{RDA}{blabla}
+\item{RDA}{a RDA model from which to extract loci and environmental variable scores}
 
-\item{K}{blabla}
+\item{K}{an integer specifying the number of RDA axes to use for the projection}
 
-\item{env}{blabla}
+\item{env}{a data.frame with the environmental conditions of the sites to predict}
 
-\item{env_mask}{(\emph{optional, default} \code{NULL}) \cr blabla}
+\item{env_mask}{(\emph{optional, default} \code{NULL}) \cr a shapefile to limit the projection to a specific area}
 
-\item{method}{(\emph{default} \code{'loadings'}) \cr blabla}
-
-\item{scale_env}{blabla}
-
-\item{center_env}{blabla}
+\item{method}{(\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages "wa" (RDA scaling type 1) or the linear combinations "lc" (RDA scaling type 2) to predict site scores (adaptive index) from the environmental scores}
 }
 \value{
-A \code{matrix} containing blabla
+A \code{raster stack} or a  \code{data.frame} containing the projections for each RDA axis retained
 }
 \description{
-This function allows the user to project the adaptive component turnover across 
-a landscape.
+This function allows the user to estimate the optimal adaptive genetic component for any combination of environmental conditions. 
+The function project that adaptive component onto the landscape.
 }
 \details{
-Blablabla
+The adaptive index thus provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. 
+When projected on a map it allows visualizing the different adaptive gradients across a species range.
 }
 \author{
 Thibaut Capblancq

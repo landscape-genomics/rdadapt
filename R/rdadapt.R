@@ -64,7 +64,7 @@ setMethod('rdadapt', signature(RDA = "rda"), function(RDA, K)
   }
   
   ## FUNCTION -----------------------------------------------------------------
-  zscores <- RDA$CCA$v[, 1:as.numeric(K)]
+  scores <- RDA$CCA$v[, 1:as.numeric(K)]
   return(rdadapt(scores = scores))
 })
 
@@ -75,7 +75,7 @@ setMethod('rdadapt', signature(RDA = "rda"), function(RDA, K)
 
 setMethod('rdadapt', signature(scores = "data.frame", RDA = "missing", K = "missing"), function(scores)
 {
-  zscores <- as.matrix(scores)
+  scores <- as.matrix(scores)
   return(rdadapt(scores = scores))
 })
 

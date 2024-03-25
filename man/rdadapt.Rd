@@ -5,20 +5,20 @@
 \alias{rdadapt,rda,ANY,ANY-method}
 \alias{rdadapt,missing,missing,data.frame-method}
 \alias{rdadapt,missing,missing,matrix-method}
-\title{RDA based detection of outlier loci}
+\title{Detect outlier loci based on their contribution to a RDA model}
 \usage{
-rdadapt(RDA, K, zscores)
+rdadapt(RDA, K, scores)
 
 \S4method{rdadapt}{rda,ANY,ANY}(RDA, K)
 
-\S4method{rdadapt}{missing,missing,data.frame}(zscores)
+\S4method{rdadapt}{missing,missing,data.frame}(scores)
 
-\S4method{rdadapt}{missing,missing,matrix}(zscores)
+\S4method{rdadapt}{missing,missing,matrix}(scores)
 }
 \arguments{
-\item{RDA}{the RDA model from which to extract loci loadings for the outlier detection.}
+\item{RDA}{a RDA model from which to extract loci loadings}
 
-\item{K}{an integer specifying the number of RDA axes to retain.}
+\item{K}{an integer specifying the number of RDA axes to use for the detection}
 }
 \value{
 A \code{data.frame} containing :
@@ -28,7 +28,7 @@ A \code{data.frame} containing :
 }
 }
 \description{
-\code{rdadapt} performs redundancy analysis and computes p-values to
+The \code{rdadapt} function performs redundancy analysis and computes p-values to
 test for outliers based on loci extremeness along a distribution of Mahalanobis distances 
 estimated between each locus and the center of the RDA space using a certain number of axes (K). 
 \code{rdadapt} accommodates individual genotypes or allele frequencies.
