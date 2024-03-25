@@ -8,7 +8,6 @@ navbar:
   structure:
     left:
     - home
-    - videos
     - examples
     - reference
     right:

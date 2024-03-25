@@ -2,26 +2,29 @@
 ##' @name rdadapt
 ##' @author Thibaut Capblancq
 ##' 
-##' @title RDA based genome scan
+##' @title RDA based detection of outlier loci
 ##' 
-##' @description This function allows the user to ...
+##' @description  \code{rdadapt} performs redundancy analysis and computes p-values to
+##' test for outliers based on loci extremeness along a distribution of Mahalanobis distances 
+##' estimated between each locus and the center of the RDA space using a certain number of axes (K). 
+##' \code{rdadapt} accommodates individual genotypes or allele frequencies.
 ##' 
-##' @param RDA blabla
-##' @param K blabla
+##' @param RDA the RDA model from which to extract loci loadings for the outlier detection.
+##' @param K an integer specifying the number of RDA axes to retain.
 ##' 
 ##' @return  
 ##' 
 ##' A \code{data.frame} containing :
 ##' \itemize{
-##'   \item \code{p.values} : blabla
-##'   \item \code{q.values} : blabla
+##'   \item \code{p.values} : the p-value associated with each locus
+##'   \item \code{q.values} : the q-value associated with each locus, estimated using the \code{q.values} package and allowing to use a FDR (False Discovery Rate) approach instead of a p-value threshold to identify outliers.
 ##' }
 ##' 
 ##' 
 ##' @details
 ##' 
-##' Blablabla
-##' 
+##' First, Mahalanobis distances are computed for all genetic marker using a robust estimate of both mean and covariance matrix between the \code{K} RDA vectors of loadings.
+##' Then, to compute p-values, Mahalanobis distances are divided by a genomic inflation factor (\code{gif}), giving a scaled statistic that should follow a chi-squared distribution with \code{K} degrees of freedom. 
 ##' 
 ##' @keywords 
 ##' 
