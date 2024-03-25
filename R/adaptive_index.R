@@ -2,18 +2,16 @@
 ##' @name adaptive_index
 ##' @author Thibaut Capblancq
 ##' 
-##' @title Adaptive index
+##' @title Project adaptive variation across space onto current or future landscape
 ##' 
-##' @description This function allows the user to project the adaptive component turnover across 
-##' a landscape.
+##' @description This function allows the user to estimate the optimal adaptive genetic component for any combination of environmental conditions. 
+##' The function project that adaptive component onto the landscape.
 ##' 
-##' @param RDA blabla
-##' @param K blabla
-##' @param env blabla
-##' @param env_mask (\emph{optional, default} \code{NULL}) \cr blabla
-##' @param method  (\emph{default} \code{'loadings'}) \cr blabla
-##' @param scale_env blabla
-##' @param center_env blabla
+##' @param RDA a RDA model from which to extract loci and environmental variable scores
+##' @param K an integer specifying the number of RDA axes to use for the projection
+##' @param env a data.frame with the environmental conditions of the sites to predict
+##' @param env_mask (\emph{optional, default} \code{NULL}) \cr a shapefile to limit the projection to a specific area
+##' @param method  (\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages "wa" (RDA scaling type 1) or the linear combinations "lc" (RDA scaling type 2) to predict site scores (adaptive index) from the environmental scores
 ##' 
 ##' @return  
 ##' 
@@ -22,7 +20,8 @@
 ##' 
 ##' @details
 ##' 
-##' Blablabla
+##' The adaptive index thus provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. 
+##' When projected on a map it allows visualizing the different adaptive gradients across a species range.
 ##' 
 ##' 
 ##' @keywords 
@@ -34,7 +33,6 @@
 ##' 
 ##' @importFrom foreach foreach %do%
 ##' @importFrom terra crs rast as.data.frame mask
-##' @importFrom vegan predict
 ##' 
 ##' @export
 ##' 

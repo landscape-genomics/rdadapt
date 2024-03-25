@@ -2,15 +2,15 @@
 ##' @name rdadapt
 ##' @author Thibaut Capblancq
 ##' 
-##' @title RDA based detection of outlier loci
+##' @title Detect outlier loci based on their contribution to a RDA model
 ##' 
-##' @description  \code{rdadapt} performs redundancy analysis and computes p-values to
+##' @description The \code{rdadapt} function performs redundancy analysis and computes p-values to
 ##' test for outliers based on loci extremeness along a distribution of Mahalanobis distances 
 ##' estimated between each locus and the center of the RDA space using a certain number of axes (K). 
 ##' \code{rdadapt} accommodates individual genotypes or allele frequencies.
 ##' 
-##' @param RDA the RDA model from which to extract loci loadings for the outlier detection.
-##' @param K an integer specifying the number of RDA axes to retain.
+##' @param RDA a RDA model from which to extract loci loadings
+##' @param K an integer specifying the number of RDA axes to use for the detection
 ##' 
 ##' @return  
 ##' 
@@ -44,7 +44,7 @@
 ###################################################################################################
 
 
-setGeneric("rdadapt", def = function(RDA, K, zscores) { standardGeneric( "rdadapt") })
+setGeneric("rdadapt", def = function(RDA, K, scores) { standardGeneric( "rdadapt") })
 
 ##'
 ##' @rdname rdadapt
@@ -65,7 +65,7 @@ setMethod('rdadapt', signature(RDA = "rda"), function(RDA, K)
   
   ## FUNCTION -----------------------------------------------------------------
   zscores <- RDA$CCA$v[, 1:as.numeric(K)]
-  return(rdadapt(zscores = zscores))
+  return(rdadapt(scores = scores))
 })
 
 ##'
@@ -73,10 +73,10 @@ setMethod('rdadapt', signature(RDA = "rda"), function(RDA, K)
 ##' @export
 ##'
 
-setMethod('rdadapt', signature(zscores = "data.frame", RDA = "missing", K = "missing"), function(zscores)
+setMethod('rdadapt', signature(scores = "data.frame", RDA = "missing", K = "missing"), function(scores)
 {
-  zscores <- as.matrix(zscores)
-  return(rdadapt(zscores = zscores))
+  zscores <- as.matrix(scores)
+  return(rdadapt(scores = scores))
 })
 
 ##'
@@ -84,10 +84,10 @@ setMethod('rdadapt', signature(zscores = "data.frame", RDA = "missing", K = "mis
 ##' @export
 ##'
 
-setMethod('rdadapt', signature(zscores = "matrix", RDA = "missing", K = "missing"), function(zscores)
+setMethod('rdadapt', signature(scores = "matrix", RDA = "missing", K = "missing"), function(scores)
 {
-  K <- ncol(zscores)
-  resscale <- apply(zscores, 2, scale)
+  K <- ncol(scores)
+  resscale <- apply(scores, 2, scale)
   resmaha <- covRob(resscale, distance = TRUE, na.action = na.omit, estim = "pairwiseGK")$dist
   lambda <- median(resmaha) / qchisq(0.5, df = K)
   reschi2test <- pchisq(resmaha / lambda, K, lower.tail = FALSE)

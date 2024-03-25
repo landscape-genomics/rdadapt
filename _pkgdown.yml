@@ -3,7 +3,7 @@ authors:
     href: https://scholar.google.fr/citations?user=BuqUlRcAAAAJ&hl=fr&oi=ao
   Maya Gueguen:
     href: https://mayagueguen.github.io
-  Bren Forester:
+  Brenna Forester:
     href: https://brenna-forester.weebly.com
 
 navbar:
@@ -37,13 +37,13 @@ navbar:
 
 tutorial:
       title: Landscape genomics analyses based on RDA models
-        contents: 
-          - "Data Preparation"
-          - "Genome Scan"
-          - "Adaptive Index"
-          - "Genomic Offset"
-          - "Loci Modules"
-          - "Adaptive Groups"
+      contents:
+        - "Data Preparation"
+        - "Genome Scan"
+        - "Adaptive Index"
+        - "Genomic Offset"
+        - "Loci Modules"
+        - "Adaptive Groups"
 
 reference:
   - title: All functions

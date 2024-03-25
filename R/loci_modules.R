@@ -1,5 +1,5 @@
 ###################################################################################################
-##' @name loci_module
+##' @name loci_modules
 ##' @author Thibaut Capblancq
 ##' 
 ##' @title Loci clustering
@@ -38,7 +38,7 @@
 ##'
 ###################################################################################################
 
-loci_module <- function(RDA, K)
+loci_modules <- function(RDA, K)
 {
   # K-means clustering with K = 2
   clusters <- kmeans(abs(RDA_outliers$CCA$v)[, 1:2], 2, iter.max = 10, nstart = 3)
