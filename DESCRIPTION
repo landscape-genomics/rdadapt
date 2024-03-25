@@ -6,9 +6,12 @@ Date: 2024-03-15
 Authors@R: c(person("Thibaut", "Capblancq", role = c("aut", "cre")
                     , email = "thibaut.capblancq@univ-grenoble-alpes.fr"),
              person("Maya", "Gueguen", role = c("aut")
-                    , email = "maya.gueguen@univ-grenoble-alpes.fr"))
+                    , email = "maya.gueguen@univ-grenoble-alpes.fr"),
+             person("Brenna", "Forester", role = c("aut")
+                    , email = "xxx"))
 Author: Thibaut Capblancq [aut, cre],
-    Maya Gueguen [aut]
+    Maya Gueguen [aut],
+    Brenna Forester [aut]
 Maintainer: Thibaut Capblancq <thibaut.capblancq@univ-grenoble-alpes.fr>
 Contact: Thibaut Capblancq <thibaut.capblancq@univ-grenoble-alpes.fr>, 
     Maya Gueguen <maya.gueguen@univ-grenoble-alpes.fr>
