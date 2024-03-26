@@ -5,7 +5,7 @@
 \alias{genomic_offset,rda,ANY,SpatRaster,ANY,ANY,missing-method}
 \alias{genomic_offset,rda,ANY,data.frame,ANY,missing,missing-method}
 \alias{genomic_offset,rda,ANY,data.frame,missing,missing,ANY-method}
-\title{Genomic offset}
+\title{Predict temporal or geographic genomic offset}
 \usage{
 genomic_offset(
   RDA,
@@ -24,26 +24,33 @@ genomic_offset(
 \S4method{genomic_offset}{rda,ANY,data.frame,missing,missing,ANY}(RDA, K, env_pres, env_gar, method = "loadings")
 }
 \arguments{
-\item{RDA}{blabla}
+\item{RDA}{a RDA model from which to extract loci and environmental variable scores}
 
-\item{K}{blabla}
+\item{K}{an integer specifying the number of RDA axes to use for the projection}
 
-\item{env_pres}{blabla}
+\item{env_pres}{a stack of rasters or a data.frame with the environmental conditions in the present}
 
-\item{env_fut}{blabla}
+\item{env_fut}{a stack of rasters or a data.frame with the environmental conditions in the present}
 
-\item{env_mask}{(\emph{optional, default} \code{NULL}) \cr blabla}
+\item{env_mask}{(\emph{optional, default} \code{NULL}) \cr a shapefile to limit the projection to a specific area}
 
-\item{method}{(\emph{default} \code{'loadings'}) \cr blabla}
+\item{method}{(\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages (scaling type 1) or the linear combinations (scaling type 2) of the projected environmental variables to predict site scores (i.e., adaptive index)}
 }
 \value{
-A \code{list} containing blabla
+##' A \code{list} containing :
+\itemize{
+  \item \code{genomic_offset} : a \code{raster stack} or a  \code{data.frame} containing the genomic offset predictions for the \code{K} first RDA axes, as well as the overall genomic offset prediction.
+  \item \code{weights} : the weights associated with each RDA axis used for the predicitons
+}
 }
 \description{
-This function allows the user to predict genomic offset from a RDA model.
+The \code{genomic_offset} function allows the user to predict genomic offset from a RDA model.
+\code{adaptive_groups} can estimate both temporal or spatial genomic offset and accommodates raster data or discrete populations.
 }
 \details{
-Blablabla
+The RDA-based method to predict genomic offset is relatively simple. 
+RDA is first used to predict the optimal adaptive genetic composition for each environmental pixel under consideration (\code{adaptive_index} function), using both current and future environmental conditions. 
+The euclidean distance between these two predictions in the RDA space provides an estimate of the change in genetic composition that would be required to track climate change.
 }
 \author{
 Thibaut Capblancq

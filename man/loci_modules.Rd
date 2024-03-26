@@ -2,27 +2,28 @@
 % Please edit documentation in R/loci_modules.R
 \name{loci_modules}
 \alias{loci_modules}
-\title{Loci clustering}
+\title{Find groups of co-varying loci}
 \usage{
-loci_modules(RDA, K)
+loci_modules(RDA, nb_clusters)
 }
 \arguments{
-\item{RDA}{blabla}
+\item{RDA}{a RDA model from which to extract loci and environmental variable scores}
 
-\item{K}{blabla}
+\item{nb_clusters}{an integer specifying the number of cluster to identify}
 }
 \value{
-A \code{data.frame} containing :
+A \code{list} containing :
 \itemize{
-  \item \code{p.values} : blabla
-  \item \code{q.values} : blabla
+  \item \code{loci} : a \code{data.frame} with the cluster associated with each locus
+  \item \code{polygons} : polygon coordinates to outline the different cluster on a 2D RDA space 
 }
 }
 \description{
-This function allows the user to find groups of covarying loci on the RDA space.
+The \code{loci_modules} function allows the user to find groups of covarying loci on the RDA space.
 }
 \details{
-Blablabla
+Identify a discrete number of adaptive groups across the 2D RDA space.
+Next version will use more than two dimensions
 }
 \author{
 Thibaut Capblancq

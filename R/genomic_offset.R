@@ -5,24 +5,30 @@
 ##' @title Predict temporal or geographic genomic offset
 ##' 
 ##' @description The \code{genomic_offset} function allows the user to predict genomic offset from a RDA model.
+##' \code{adaptive_groups} can estimate both temporal or spatial genomic offset and accommodates raster data or discrete populations.
 ##' 
 ##' @param RDA a RDA model from which to extract loci and environmental variable scores
 ##' @param K an integer specifying the number of RDA axes to use for the projection
 ##' @param env_pres a stack of rasters or a data.frame with the environmental conditions in the present
 ##' @param env_fut a stack of rasters or a data.frame with the environmental conditions in the present
-##' @param env_mask (\emph{optional, default} \code{NULL}) \cr blabla
-##' @param method  (\emph{default} \code{'loadings'}) \cr blabla
+##' @param env_mask (\emph{optional, default} \code{NULL}) \cr a shapefile to limit the projection to a specific area
+##' @param method  (\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages (scaling type 1) or the linear combinations (scaling type 2) of the projected environmental variables to predict site scores (i.e., adaptive index)
 ##' 
 ##' 
 ##' @return  
 ##' 
-##' A \code{list} containing blabla
+##' ##' A \code{list} containing :
+##' \itemize{
+##'   \item \code{genomic_offset} : a \code{raster stack} or a  \code{data.frame} containing the genomic offset predictions for the \code{K} first RDA axes, as well as the overall genomic offset prediction.
+##'   \item \code{weights} : the weights associated with each RDA axis used for the predicitons
+##' }
 ##' 
 ##' 
 ##' @details
 ##' 
-##' The RDA-based method to predict maladaptation is relatively simple. 
-##' RDA is first used to predict the optimal adaptive genetic composition for each environmental pixel under consideration (\code{adaptive_index} function), using both current and future environmental conditions. The difference between the two predictions provides an estimate of the change in genetic composition that would be required to track climate change
+##' The RDA-based method to predict genomic offset is relatively simple. 
+##' RDA is first used to predict the optimal adaptive genetic composition for each environmental pixel under consideration (\code{adaptive_index} function), using both current and future environmental conditions. 
+##' The euclidean distance between these two predictions in the RDA space provides an estimate of the change in genetic composition that would be required to track climate change.
 ##' 
 ##' 
 ##' @keywords 

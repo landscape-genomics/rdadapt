@@ -2,26 +2,30 @@
 ##' @name adaptive_groups
 ##' @author Thibaut Capblancq
 ##' 
-##' @title Site clustering
+##' @title Find groups of co-varying individuals/populations
 ##' 
-##' @description This function allows the user to find groups of covarying 
-##' sites/individuals/populations within the RDA space.
+##' @description The \code{adaptive_groups} function allows the user to find groups of covarying 
+##' individuals/populations based on their scores in the RDA space and a hkmean clustering procedure. 
+##' \code{adaptive_groups} accommodates stack of rasters or discrete populations.
 ##' 
-##' @param RDA blabla
-##' @param K blabla
+##' @param RDA a RDA model from which to extract loci and environmental variable scores
+##' @param K an integer specifying the number of RDA axes to use for the clustering
+##' @param env a stack of rasters or a data.frame with the environmental conditions of the sites to predict
+##' @param nb_clusters an integer specifying the number of cluster to identify
 ##' 
 ##' @return  
 ##' 
-##' A \code{data.frame} containing :
+##' A \code{list} containing :
 ##' \itemize{
-##'   \item \code{p.values} : blabla
-##'   \item \code{q.values} : blabla
+##'   \item \code{samples} : a \code{data.frame} with the cluster associated with each individual/population
+##'   \item \code{polygons} : polygon coordinates to outline the different cluster on a 2D RDA space 
 ##' }
 ##' 
 ##' 
 ##' @details
 ##' 
-##' Blablabla
+##' Identify a discrete number of adaptive groups across the 2D RDA space.
+##' Next version will use more than two dimensions
 ##' 
 ##' 
 ##' @keywords 

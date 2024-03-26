@@ -22,7 +22,7 @@ navbar:
     tutorial:
       text: tutorial
       icon: fas fa-stethoscope
-      href: vignette_tutorial.html
+      href: articles/vignette_tutorial.html
     reference:
       text: Reference
       icon: fa-book fa-lg

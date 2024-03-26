@@ -1,6 +1,6 @@
 Package: rdadapt
 Type: Package
-Title: Blabla
+Title: The multiple uses of RDA in landscape genomics
 Version: 1.0.0
 Date: 2024-03-15
 Authors@R: c(person("Thibaut", "Capblancq", role = c("aut", "cre")

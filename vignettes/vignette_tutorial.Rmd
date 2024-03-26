@@ -441,7 +441,7 @@ We can find covarying sets of loci on the RDA space
 source("../R/loci_modules.R")
 
 ## Groups the outlier loci into two modules
-modules <- loci_modules(RDA = RDA_outliers, K = 2)
+modules <- loci_modules(RDA = RDA_outliers, nb_clusters = 4)
 
 ## Visualization
 ggplot() +

@@ -2,25 +2,26 @@
 ##' @name loci_modules
 ##' @author Thibaut Capblancq
 ##' 
-##' @title Loci clustering
+##' @title Find groups of co-varying loci
 ##' 
-##' @description This function allows the user to find groups of covarying loci on the RDA space.
+##' @description The \code{loci_modules} function allows the user to find groups of covarying loci on the RDA space.
 ##' 
-##' @param RDA blabla
-##' @param K blabla
+##' @param RDA a RDA model from which to extract loci and environmental variable scores
+##' @param nb_clusters an integer specifying the number of cluster to identify
 ##' 
 ##' @return  
 ##' 
-##' A \code{data.frame} containing :
+##' A \code{list} containing :
 ##' \itemize{
-##'   \item \code{p.values} : blabla
-##'   \item \code{q.values} : blabla
+##'   \item \code{loci} : a \code{data.frame} with the cluster associated with each locus
+##'   \item \code{polygons} : polygon coordinates to outline the different cluster on a 2D RDA space 
 ##' }
 ##' 
 ##' 
 ##' @details
 ##' 
-##' Blablabla
+##' Identify a discrete number of adaptive groups across the 2D RDA space.
+##' Next version will use more than two dimensions
 ##' 
 ##' 
 ##' @keywords 
@@ -38,10 +39,10 @@
 ##'
 ###################################################################################################
 
-loci_modules <- function(RDA, K)
+loci_modules <- function(RDA, nb_clusters)
 {
-  # K-means clustering with K = 2
-  clusters <- kmeans(abs(RDA_outliers$CCA$v)[, 1:2], 2, iter.max = 10, nstart = 3)
+  # K-means clustering 
+  clusters <- kmeans(abs(RDA_outliers$CCA$v)[, 1:2], nb_clusters, iter.max = 10, nstart = 3)
   
   # Convex hulls.
   df <- data.frame(x = abs(RDA_outliers$CCA$v[, 1])

@@ -4,7 +4,7 @@
 \alias{adaptive_index}
 \alias{adaptive_index,rda,ANY,SpatRaster,ANY-method}
 \alias{adaptive_index,rda,ANY,data.frame,missing-method}
-\title{Project adaptive variation across space onto current or future landscape}
+\title{Project adaptive variation across space onto current or future landscapes}
 \usage{
 adaptive_index(RDA, K, env, env_mask = NULL, method = "loadings")
 
@@ -17,21 +17,21 @@ adaptive_index(RDA, K, env, env_mask = NULL, method = "loadings")
 
 \item{K}{an integer specifying the number of RDA axes to use for the projection}
 
-\item{env}{a data.frame with the environmental conditions of the sites to predict}
+\item{env}{a stack of rasters or a data.frame with the environmental conditions of the sites to predict}
 
 \item{env_mask}{(\emph{optional, default} \code{NULL}) \cr a shapefile to limit the projection to a specific area}
 
-\item{method}{(\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages "wa" (RDA scaling type 1) or the linear combinations "lc" (RDA scaling type 2) to predict site scores (adaptive index) from the environmental scores}
+\item{method}{(\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages (scaling type 1) or the linear combinations (scaling type 2) of the projected environmental variables to predict site scores (i.e., adaptive index)}
 }
 \value{
-A \code{raster stack} or a  \code{data.frame} containing the projections for each RDA axis retained
+A \code{raster stack} or a  \code{data.frame} containing the projections for the \code{K} first RDA axes
 }
 \description{
-This function allows the user to estimate the optimal adaptive genetic component for any combination of environmental conditions. 
+The \code{adaptive_index} function allows the user to estimate the optimal adaptive genetic component for any combination of environmental conditions. 
 The function project that adaptive component onto the landscape.
 }
 \details{
-The adaptive index thus provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. 
+The adaptive index provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. 
 When projected on a map it allows visualizing the different adaptive gradients across a species range.
 }
 \author{

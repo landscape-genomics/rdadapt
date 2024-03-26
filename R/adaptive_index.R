@@ -11,7 +11,7 @@
 ##' @param K an integer specifying the number of RDA axes to use for the projection
 ##' @param env a stack of rasters or a data.frame with the environmental conditions of the sites to predict
 ##' @param env_mask (\emph{optional, default} \code{NULL}) \cr a shapefile to limit the projection to a specific area
-##' @param method  (\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages "wa" (RDA scaling type 1) or the linear combinations "lc" (RDA scaling type 2) to predict site scores (adaptive index) from the environmental variables
+##' @param method  (\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages (scaling type 1) or the linear combinations (scaling type 2) of the projected environmental variables to predict site scores (i.e., adaptive index)
 ##' 
 ##' @return  
 ##' 
@@ -19,7 +19,7 @@
 ##' 
 ##' @details
 ##' 
-##' The adaptive index thus provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. 
+##' The adaptive index provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. 
 ##' When projected on a map it allows visualizing the different adaptive gradients across a species range.
 ##' 
 ##' 
