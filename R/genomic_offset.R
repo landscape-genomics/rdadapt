@@ -2,14 +2,14 @@
 ##' @name genomic_offset
 ##' @author Thibaut Capblancq
 ##' 
-##' @title Genomic offset
+##' @title Predict temporal or geographic genomic offset
 ##' 
-##' @description This function allows the user to predict genomic offset from a RDA model.
+##' @description The \code{genomic_offset} function allows the user to predict genomic offset from a RDA model.
 ##' 
-##' @param RDA blabla
-##' @param K blabla
-##' @param env_pres blabla
-##' @param env_fut blabla
+##' @param RDA a RDA model from which to extract loci and environmental variable scores
+##' @param K an integer specifying the number of RDA axes to use for the projection
+##' @param env_pres a stack of rasters or a data.frame with the environmental conditions in the present
+##' @param env_fut a stack of rasters or a data.frame with the environmental conditions in the present
 ##' @param env_mask (\emph{optional, default} \code{NULL}) \cr blabla
 ##' @param method  (\emph{default} \code{'loadings'}) \cr blabla
 ##' 
@@ -21,7 +21,8 @@
 ##' 
 ##' @details
 ##' 
-##' Blablabla
+##' The RDA-based method to predict maladaptation is relatively simple. 
+##' RDA is first used to predict the optimal adaptive genetic composition for each environmental pixel under consideration (\code{adaptive_index} function), using both current and future environmental conditions. The difference between the two predictions provides an estimate of the change in genetic composition that would be required to track climate change
 ##' 
 ##' 
 ##' @keywords 
