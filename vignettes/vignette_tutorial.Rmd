@@ -40,18 +40,24 @@ We show how to run the package using XXX.
 To run the package, you need to install the package and load it using the following command lines:
 
 ```{r, message=FALSE, results='hide', eval=TRUE, warning=FALSE}
-#install_github("landscape-genomics/rdadapt")
-#library(rdadapt)
+# library(devtools)
+# install_github("landscape-genomics/rdadapt")
+library(rdadapt)
+
 library(vegan)
 library(robust)
 library(ggplot2)
 library(terra)
-library(qvalue)
 library(foreach)
 library(plyr)
 library(viridis)
 library(factoextra)
 library(reshape2)
+
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# BiocManager::install("qvalue")
+library(qvalue)
 ```
 
 <br>
@@ -147,11 +153,8 @@ screeplot(RDA_env, main="Eigenvalues of constrained axes")
 Looking at the proportion of variance explained by each axis, we decided to use the first two axes.
 
 ```{r, message=FALSE, results='hide', eval=TRUE}
-## Function rdadapt
-source("../R/rdadapt.R")
-
 ## Running the function with K = 2
-rdadapt_env<-rdadapt(RDA_env, 2)
+rdadapt_env <- rdadapt(RDA_env, 2)
 ```
 
 One critical step when conducting a genome scan is to set a pertinent p-value threshold to identify the outlier loci. Here, we used a Bonferroni correction to account for multiple testing.
@@ -269,9 +272,6 @@ The scores of the environmental variables along the RDA axes can be used to calc
 $$ Where *a* is the climatic variable score (loading) along the RDA axis, *b* is the standardized value for this particular variable at the focal pixel, and *i* refers to one of the *n* different variables used in the RDA model.
 
 ```{r, message=FALSE, results='hide', eval=TRUE}
-## Function to predict the adaptive index across the landscape
-source("../R/adaptive_index.R")
-
 ## Running the function for all pixels 
 res_RDA_proj_current <- adaptive_index(RDA = RDA_outliers, K = 2, env = xx.ras.current, env_mask = NULL, method = "loadings")
 ```
@@ -314,9 +314,6 @@ ggplot(data = TAB_RDA) +
 Once the genetic \~ environment relationship is characterized, it can be extrapolated to future environments to predict a potential shift in adaptive optimum induced by climate change.The RDA-based method to predict this future maladaptation is relatively simple. As done above, RDA can be used to predict the optimal adaptive genetic composition for each environmental pixel under consideration (Adaptive Index in Section 5), using both current and future environmental conditions. The difference between the two predictions provides an estimate of the change in genetic composition that would be required to track climate change.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10}
-## Function to predict genomic offset from a RDA model
-source("../R/genomic_offset.R")
-
 ## Projecting the adaptive landscape after the change in environment 
 res_RDA_proj <- genomic_offset(RDA = RDA_outliers, K = 2, env_pres = xx.ras.current, env_fut = xx.ras.future, env_mask = NULL, method = "loadings")
 
@@ -404,9 +401,6 @@ This geographic genomic offset can then be compared to different fitness traits 
 We can find covarying sets of loci on the RDA space
 
 ```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center', fig.align='center', fig.height = 3.5, fig.width= 5}
-## Function to find groups of loci on the RDA space
-source("../R/loci_modules.R")
-
 ## Groups the outlier loci into two modules
 modules <- loci_modules(RDA = RDA_outliers, nb_clusters = 4)
 
@@ -433,9 +427,6 @@ The goal here is to identify groups of individuals with the same adaptive backgr
 
 
 ```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
-## Function to find groups of loci on the RDA space
-source("../R/adaptive_groups.R")
-
 ## New RDA model with only sample populations and outlier loci
 RDA_samp <- rda(Y.samp[,outliers] ~ .,  xx.current.samp)
 
