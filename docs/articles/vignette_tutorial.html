@@ -46,7 +46,7 @@
   </a>
 </li>
 <li>
-  <a href="../vignette_tutorial.html">
+  <a href="../articles/vignette_tutorial.html">
     <span class="fas fa-stethoscope"></span>
      
     tutorial
@@ -114,17 +114,17 @@ and identification of co-varying modules of adaptive loci or discrete
 adaptive groups of individual or populations.</p>
 <p>These analyses were inspired from various studies:</p>
 <ul>
-<li><pre><code>  Capblancq et al. 2018</code></pre></li>
-<li><pre><code>  Forester et al. 2018</code></pre></li>
-<li><pre><code>  Capblancq et al. 2020</code></pre></li>
-<li><pre><code>  Capblancq &amp; Forester 2021</code></pre></li>
-<li><pre><code>  Capblancq et al. 2023</code></pre></li>
-<li><pre><code>  Hoste et al. 2023</code></pre></li>
+<li>Capblancq et al. 2018</li>
+<li>Forester et al. 2018</li>
+<li>Capblancq et al. 2020</li>
+<li>Capblancq &amp; Forester 2021</li>
+<li>Capblancq et al. 2023</li>
+<li>Hoste et al. 2023</li>
 </ul>
 <p>We show how to run the package using XXX</p>
 <p>To run the package, you need to install the package and load it using
 the following command lines:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#install.packages("rdadapt")</span></span>
 <span><span class="co">#library(rdadapt)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vegandevs/vegan" class="external-link">vegan</a></span><span class="op">)</span></span>
@@ -139,24 +139,29 @@ the following command lines:</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hadley/reshape" class="external-link">reshape2</a></span><span class="op">)</span></span></code></pre></div>
 <p><br></p>
 <h2>
-<ol style="list-style-type: decimal"><li>
-<p>Data Preparation</p>
+<ol style="list-style-type: decimal"><li>Data Preparation
 </li></ol>
 </h2>
-<p><br></p>
 
+<p><br></p>
 <h4>
 1.1. Genetic dataset
 </h4>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Loading genetic dataset</span></span>
 <span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv2</a></span><span class="op">(</span><span class="st">"../data/genome.csv"</span>, sep <span class="op">=</span> <span class="st">","</span>, head <span class="op">=</span> <span class="cn">TRUE</span>, row.names <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code></pre></div>
+<pre><code><span><span class="co">##     X2 X3 X5 X6 X11</span></span>
+<span><span class="co">## V10  2  0  0  1   0</span></span>
+<span><span class="co">## V11  1  0  0  2   0</span></span>
+<span><span class="co">## V12  2  0  0  0   0</span></span>
+<span><span class="co">## V13  2  0  0  2   0</span></span>
+<span><span class="co">## V14  2  0  0  2   0</span></span></code></pre>
 <h4>
 1.2. Metadata individuals and populations
 </h4>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Get population labels</span></span>
 <span><span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv2</a></span><span class="op">(</span><span class="st">"../data/pop.csv"</span>, sep <span class="op">=</span> <span class="st">","</span>, head <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
 <span></span>
@@ -168,32 +173,40 @@ the following command lines:</p>
 <h4>
 1.3. Climatic variables
 </h4>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Loading the current and future climatic variables</span></span>
 <span><span class="va">xx.current</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="st">"../data/var_current.csv"</span>, sep <span class="op">=</span> <span class="st">","</span>, head <span class="op">=</span> <span class="cn">TRUE</span>, row.names <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">xx.future</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="st">"../data/var_futur.csv"</span>, sep <span class="op">=</span> <span class="st">","</span>, head <span class="op">=</span> <span class="cn">TRUE</span>, row.names <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">## Add exxtra variables (correlated)</span></span>
-<span><span class="va">xx.current</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">xx.current</span>,VAR3 <span class="op">=</span> <span class="fl">2</span><span class="op">*</span><span class="va">xx.current</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">xx.current</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xx.current</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.07</span><span class="op">)</span>, VAR4 <span class="op">=</span> <span class="va">xx.current</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">xx.current</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xx.current</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.08</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">xx.future</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">xx.future</span>,VAR3 <span class="op">=</span> <span class="fl">2</span><span class="op">*</span><span class="va">xx.future</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">xx.future</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xx.future</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.07</span><span class="op">)</span>, VAR4 <span class="op">=</span> <span class="va">xx.future</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">xx.future</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xx.future</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.08</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## Add extra variables (correlated)</span></span>
+<span><span class="va">xx.current</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">xx.current</span></span>
+<span>                         , VAR3 <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">xx.current</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">xx.current</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xx.current</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.07</span><span class="op">)</span></span>
+<span>                         , VAR4 <span class="op">=</span> <span class="va">xx.current</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">xx.current</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xx.current</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.08</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">xx.future</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">xx.future</span></span>
+<span>                        , VAR3 <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">xx.future</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">xx.future</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xx.future</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.07</span><span class="op">)</span></span>
+<span>                        , VAR4 <span class="op">=</span> <span class="va">xx.future</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">xx.future</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xx.future</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.08</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Rasterize the variables</span></span>
-<span><span class="va">xx.ras.current</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, time <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>, </span>
-<span>                                  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, each <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>, </span>
-<span>                                  <span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">xx.current</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">coord</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">coord</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="va">mean</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, </span>
-<span>                       type<span class="op">=</span><span class="st">"xyz"</span>, </span>
-<span>                       crs <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="st">"epsg:4326"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">xx.ras.current</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, time <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span>                                  , y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, each <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span>                                  , <span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">xx.current</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">coord</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                                                    , <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">coord</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                              , <span class="va">mean</span><span class="op">)</span><span class="op">[</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span>                       , type <span class="op">=</span> <span class="st">"xyz"</span></span>
+<span>                       , crs <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="st">"epsg:4326"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">xx.ras.current</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">xx.ras.future</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, time <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
-<span>                                 y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, each <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>, </span>
-<span>                                 <span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">xx.future</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">coord</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">coord</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="va">mean</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, </span>
-<span>                      type<span class="op">=</span><span class="st">"xyz"</span>, </span>
-<span>                      crs <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="st">"epsg:4326"</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">xx.ras.future</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, time <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span>                                 , y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, each <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span>                                 , <span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">xx.future</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">coord</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                                                , <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">coord</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                           , <span class="va">mean</span><span class="op">)</span><span class="op">[</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span>                      , type<span class="op">=</span><span class="st">"xyz"</span></span>
+<span>                      , crs <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="st">"epsg:4326"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">xx.ras.future</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-4-2.png" width="700"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Randomly selects only 25 populations to mimic more what we have in our empirical datasets</span></span>
 <span><span class="va">samp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pop</span> <span class="op"><a href="https://rspatial.github.io/terra/reference/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">25</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -201,32 +214,32 @@ the following command lines:</p>
 <span><span class="va">coord.samp</span> <span class="op">&lt;-</span> <span class="va">coord</span><span class="op">[</span><span class="va">samp</span>,<span class="op">]</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">coord.samp</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-5-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Y.samp</span> <span class="op">&lt;-</span> <span class="va">Y</span><span class="op">[</span><span class="va">samp</span>,<span class="op">]</span></span>
 <span><span class="va">xx.current.samp</span> <span class="op">&lt;-</span> <span class="va">xx.current</span><span class="op">[</span><span class="va">samp</span>,<span class="op">]</span></span>
 <span><span class="va">xx.future.samp</span> <span class="op">&lt;-</span> <span class="va">xx.future</span><span class="op">[</span><span class="va">samp</span>,<span class="op">]</span></span></code></pre></div>
-<ol start="2" style="list-style-type: decimal">
-<li>
-<p>Genome Scan</p>
+<p><br></p>
+<h2>
+<ol start="2" style="list-style-type: decimal"><li>Genome Scan
+</li></ol>
+</h2>
 
 <p><br></p>
-</li>
-</ol>
 <h4>
 2.1 Identifying loci under selection using RDA
 </h4>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RDA_env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="va">.</span>,  <span class="va">xx.current</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">RDA_env</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 <p>We then had to choose a number of RDA axes to include when conducting
 the genome scan.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/screeplot.html" class="external-link">screeplot</a></span><span class="op">(</span><span class="va">RDA_env</span>, main<span class="op">=</span><span class="st">"Eigenvalues of constrained axes"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-7-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Looking at the proportion of variance explained by each axis, we
 decided to use the first two axes.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Function rdadapt</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"../R/rdadapt.R"</span><span class="op">)</span></span>
 <span></span>
@@ -235,14 +248,14 @@ decided to use the first two axes.</p>
 <p>One critical step when conducting a genome scan is to set a pertinent
 p-value threshold to identify the outlier loci. Here, we used a
 Bonferroni correction to account for multiple testing.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## P-values threshold after Bonferroni correction</span></span>
 <span><span class="va">thres_env</span> <span class="op">&lt;-</span> <span class="fl">0.01</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">rdadapt_env</span><span class="op">$</span><span class="va">p.values</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Identifying the loci that are below the p-value threshold</span></span>
 <span><span class="va">outliers</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">rdadapt_env</span><span class="op">$</span><span class="va">p.values</span><span class="op">&lt;</span><span class="va">thres_env</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>The function finds 215 outliers</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Get adaptive loci for env variable 1 and env variable 2</span></span>
 <span><span class="va">causal1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv2</a></span><span class="op">(</span><span class="st">"../data/mutationm2.csv"</span>, sep <span class="op">=</span> <span class="st">","</span>, head <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">causal2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv2</a></span><span class="op">(</span><span class="st">"../data/mutationm3.csv"</span>, sep <span class="op">=</span> <span class="st">","</span>, head <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
@@ -255,7 +268,7 @@ Bonferroni correction to account for multiple testing.</p>
 <p>Once the outliers have been identified, it can be useful to visualize
 their distribution in comparison with neutral loci using either an RDA
 biplot or a Manhattan plot.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ## Formatting table for ggplot</span></span>
 <span><span class="co"># locus_scores &lt;- scores(RDA_env, choices=c(1:2), display="species", scaling="none") # vegan references "species", here these are the loci</span></span>
 <span><span class="co"># TAB_loci &lt;- data.frame(names = row.names(locus_scores), locus_scores)</span></span>
@@ -300,24 +313,23 @@ biplot or a Manhattan plot.</p>
 <span><span class="co">#   theme(legend.position="right", legend.background = element_blank(), panel.grid = element_blank(), legend.box.background = element_blank(), plot.background = element_blank(), panel.background = element_blank(), legend.text=element_text(size=rel(.8)), strip.text = element_text(size=11))</span></span></code></pre></div>
 <p><br></p>
 <h2>
-<ol start="3" style="list-style-type: decimal"><li>
-<p>Adaptive Index</p>
+<ol start="3" style="list-style-type: decimal"><li>Adaptive Index
 </li></ol>
 </h2>
-<p><br></p>
 
+<p><br></p>
 <h4>
 3.1. Adaptively enriched genetic space
 </h4>
 <p>The 91 putative adaptive loci can be used as multivariate response in
 a new “adaptively enriched” RDA, using the 9 selected bioclimate
 variables as explanatory variables.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Adaptively enriched RDA</span></span>
 <span><span class="va">RDA_outliers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">Y</span><span class="op">[</span>,<span class="va">outliers</span><span class="op">]</span> <span class="op">~</span> <span class="va">.</span>,  <span class="va">xx.current</span><span class="op">)</span></span></code></pre></div>
 <p>An RDA biplot allows us to visualize the relationship between the 91
 putative adaptive loci and the underlying climatic variables.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## RDA biplot</span></span>
 <span><span class="va">TAB_loci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/vegan/man/scores.html" class="external-link">scores</a></span><span class="op">(</span><span class="va">RDA_outliers</span>, choices<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>, display<span class="op">=</span><span class="st">"species"</span>, scaling<span class="op">=</span><span class="st">"none"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">TAB_var</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/vegan/man/scores.html" class="external-link">scores</a></span><span class="op">(</span><span class="va">RDA_outliers</span>, choices<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>, display<span class="op">=</span><span class="st">"bp"</span><span class="op">)</span><span class="op">)</span></span>
@@ -346,7 +358,7 @@ independently for each RDA axis of interest using the formula: <span class="math
 along the RDA axis, <em>b</em> is the standardized value for this
 particular variable at the focal pixel, and <em>i</em> refers to one of
 the <em>n</em> different variables used in the RDA model.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Function to predict the adaptive index across the landscape</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"../R/adaptive_index.R"</span><span class="op">)</span></span>
 <span></span>
@@ -357,7 +369,7 @@ similarity or difference of all pixels on the landscape as a function of
 the values of the environmental predictors at that location. When
 projected on a map it allows visualizing the different adaptive
 gradients across a species range.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Vectorization of the climatic rasters for ggplot</span></span>
 <span><span class="va">RDA_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">res_RDA_proj_current</span><span class="op">$</span><span class="va">RDA1</span>, <span class="va">res_RDA_proj_current</span><span class="op">$</span><span class="va">RDA2</span><span class="op">)</span></span>
 <span><span class="va">RDA_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">RDA_proj</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">x</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
@@ -383,12 +395,11 @@ gradients across a species range.</p>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-15-1.png" width="960" style="display: block; margin: auto;"></p>
 <p><br></p>
 <h2>
-<ol start="4" style="list-style-type: decimal"><li>
-<p>Genomic Offset</p>
+<ol start="4" style="list-style-type: decimal"><li>Genomic Offset
 </li></ol>
 </h2>
-<p><br></p>
 
+<p><br></p>
 <h4>
 4.1. Predicting population future maladaptation
 </h4>
@@ -402,7 +413,7 @@ each environmental pixel under consideration (Adaptive Index in Section
 difference between the two predictions provides an estimate of the
 change in genetic composition that would be required to track climate
 change.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Function to predict genomic offset from a RDA model</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"../R/genomic_offset.R"</span><span class="op">)</span></span>
 <span></span>
@@ -422,12 +433,12 @@ change.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">11</span>, base_family <span class="op">=</span> <span class="st">"Times"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">11</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-16-1.png" width="960" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Verifying that prediction are matching with a decline in fitness on the landscape</span></span>
 <span><span class="va">diff.env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">(</span><span class="va">xx.ras.current</span><span class="op">[[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">-</span> <span class="va">xx.ras.future</span><span class="op">[[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">diff.env</span>, <span class="va">RDA_proj_offset</span><span class="op">$</span><span class="va">Global_offset</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-17-1.png" width="960" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitness</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="st">"../data/fitness_futur.csv"</span>, header <span class="op">=</span> <span class="cn">T</span>, sep <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fitness.future</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, time <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
@@ -446,7 +457,7 @@ change.</p>
 validate the predictions. Here, we estimated a geographic genomic offset
 between the climate of each source population and the climate of a
 hypothetical garden (cell 1,1).</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Estimates genomic offset for specific populations</span></span>
 <span><span class="va">offset_samp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomic_offset.html">genomic_offset</a></span><span class="op">(</span>RDA <span class="op">=</span> <span class="va">RDA_outliers</span>, K <span class="op">=</span> <span class="fl">2</span>, env_pres <span class="op">=</span> <span class="va">xx.current.samp</span>, env_fut <span class="op">=</span> <span class="va">xx.future.samp</span>, method <span class="op">=</span> <span class="st">"loadings"</span><span class="op">)</span></span>
 <span></span>
@@ -461,7 +472,7 @@ hypothetical garden (cell 1,1).</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">12</span>, base_family <span class="op">=</span> <span class="st">"Times"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, panel.grid <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">12</span><span class="op">)</span>, plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-18-1.png" width="864" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Estimates genomic offset for a transplantation experiment</span></span>
 <span><span class="va">offset_gar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomic_offset.html">genomic_offset</a></span><span class="op">(</span>RDA <span class="op">=</span> <span class="va">RDA_outliers</span>, K <span class="op">=</span> <span class="fl">2</span>, env_pres <span class="op">=</span> <span class="va">xx.current</span>, env_gar <span class="op">=</span> <span class="va">xx.current</span><span class="op">[</span><span class="fl">100</span>,<span class="op">]</span>, method <span class="op">=</span> <span class="st">"loadings"</span><span class="op">)</span></span>
 <span></span>
@@ -488,19 +499,18 @@ distance estimated between each source population and the garden from
 the climatic variables only (using Mahalanobis distance).</p>
 <p><br></p>
 <h2>
-<ol start="5" style="list-style-type: decimal"><li>
-<p>Loci Modules</p>
+<ol start="5" style="list-style-type: decimal"><li>Loci Modules
 </li></ol>
 </h2>
-<p><br></p>
 
+<p><br></p>
 <p>We can find covarying sets of loci on the RDA space</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Function to find groups of loci on the RDA space</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"../R/loci_modules.R"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Groups the outlier loci into two modules</span></span>
-<span><span class="va">modules</span> <span class="op">&lt;-</span> <span class="fu">loci_modules</span><span class="op">(</span>RDA <span class="op">=</span> <span class="va">RDA_outliers</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">modules</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loci_modules.html">loci_modules</a></span><span class="op">(</span>RDA <span class="op">=</span> <span class="va">RDA_outliers</span>, nb_clusters <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Visualization</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -515,15 +525,14 @@ the climatic variables only (using Mahalanobis distance).</p>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-20-1.png" width="480" style="display: block; margin: auto;"></p>
 <p><br></p>
 <h2>
-<ol start="6" style="list-style-type: decimal"><li>
-<p>Adaptive groups</p>
+<ol start="6" style="list-style-type: decimal"><li>Adaptive groups
 </li></ol>
 </h2>
-<p><br></p>
 
+<p><br></p>
 <p>The goal here is to identify groups of individuals with the same
 adaptive background</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Function to find groups of loci on the RDA space</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"../R/adaptive_groups.R"</span><span class="op">)</span></span>
 <span></span>
@@ -544,12 +553,12 @@ adaptive background</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">12</span>, base_family <span class="op">=</span> <span class="st">"Times"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position<span class="op">=</span><span class="st">"none"</span>, panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, panel.grid <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">12</span><span class="op">)</span>, plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-21-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Visualization on the landscape</span></span>
 <span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">coord.samp</span>, cluster <span class="op">=</span> <span class="va">groups</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tab</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, col <span class="op">=</span> <span class="va">tab</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette_tutorial_files/figure-html/unnamed-chunk-21-2.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Finds N groups on the adaptive landscape projected from the RDA model</span></span>
 <span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/adaptive_groups.html">adaptive_groups</a></span><span class="op">(</span>RDA <span class="op">=</span> <span class="va">RDA_samp</span>, K <span class="op">=</span> <span class="fl">2</span>, env <span class="op">=</span> <span class="va">xx.ras.current</span>, nb_clusters <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span>
 <span></span>

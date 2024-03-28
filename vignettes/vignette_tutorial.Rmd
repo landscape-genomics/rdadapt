@@ -18,54 +18,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <br>
 
-rdadapt was developed to facilitate the exploration and projection of the gene \~ environment relationship across current and future landscapes. The packages provides various statistical tools to conduct landscape genomics analyses going from identifying the the genetic bases of adaptation within a species to predict future population maldaptation to climate change.
+`rdadapt` was developed to facilitate the exploration and projection of the gene \~ environment relationship across current and future landscapes. The package provides various statistical tools to conduct **landscape genomic analyses** going from *identifying the genetic bases of adaptation within a species* to *predict future population maladaptation to climate change*.
 
-In the following, we show how the rdadapt package can perform variance partitioning, genome scans for selection, adaptive index projection on the landscape, as well as estimation of genomic offsets and identification of co-varying modules of adaptive loci or discrete adaptive groups of individual or populations.
+In the following, we show how the `rdadapt` package can perform variance partitioning, genome scans for selection, adaptive index projection on the landscape, as well as estimation of genomic offsets and identification of co-varying modules of adaptive loci or discrete adaptive groups of individual or populations.
 
-These analyses were inspired from various studies:
+*These analyses were inspired from various studies:*
 
--   
+- Capblancq et al. 2018
+- Forester et al. 2018
+- Capblancq et al. 2020
+- Capblancq & Forester 2021
+- Capblancq et al. 2023
+- Hoste et al. 2023
 
-    ```         
-      Capblancq et al. 2018
-    ```
 
--   
-
-    ```         
-      Forester et al. 2018
-    ```
-
--   
-
-    ```         
-      Capblancq et al. 2020
-    ```
-
--   
-
-    ```         
-      Capblancq & Forester 2021
-    ```
-
--   
-
-    ```         
-      Capblancq et al. 2023
-    ```
-
--   
-
-    ```         
-      Hoste et al. 2023
-    ```
-
-We show how to run the package using XXX
+We show how to run the package using XXX.
 
 To run the package, you need to install the package and load it using the following command lines:
 
-```{r, message=FALSE, results='hide', eval=TRUE}
-#install.packages("rdadapt")
+```{r, message=FALSE, results='hide', eval=TRUE, warning=FALSE}
+#install_github("landscape-genomics/rdadapt")
 #library(rdadapt)
 library(vegan)
 library(robust)
@@ -81,17 +53,13 @@ library(reshape2)
 
 <br>
 
-<h2>
+<h2>1. Data Preparation</h2>
 
-1.  Data Preparation
-
-    </h2>
-
-    <br>
+<br>
 
 <h4>1.1. Genetic dataset</h4>
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
+```{r, message=FALSE, warning=FALSE, eval=TRUE}
 ## Loading genetic dataset
 Y <- read.csv2("../data/genome.csv", sep = ",", head = TRUE, row.names = 1)
 
@@ -117,23 +85,33 @@ plot(coord, cex =.2)
 xx.current <- read.table("../data/var_current.csv", sep = ",", head = TRUE, row.names = 1)
 xx.future <- read.table("../data/var_futur.csv", sep = ",", head = TRUE, row.names = 1)
 
-## Add exxtra variables (correlated)
-xx.current <- data.frame(xx.current,VAR3 = 2*xx.current[,1] - xx.current[,2] + rnorm(nrow(xx.current), sd = 0.07), VAR4 = xx.current[,1] + xx.current[,2] + rnorm(nrow(xx.current), sd = 0.08))
-xx.future <- data.frame(xx.future,VAR3 = 2*xx.future[,1] - xx.future[,2] + rnorm(nrow(xx.future), sd = 0.07), VAR4 = xx.future[,1] + xx.future[,2] + rnorm(nrow(xx.future), sd = 0.08))
+## Add extra variables (correlated)
+VAR3.current <- 2 * xx.current[, 1] - xx.current[, 2] + rnorm(nrow(xx.current), sd = 0.07)
+VAR4.current <- xx.current[, 1] + xx.current[, 2] + rnorm(nrow(xx.current), sd = 0.08)
+
+VAR3.future <- 2 * xx.future[, 1] - xx.future[, 2] + rnorm(nrow(xx.future), sd = 0.07)
+VAR4.future <- xx.future[, 1] + xx.future[, 2] + rnorm(nrow(xx.future), sd = 0.08)
+
+xx.current <- data.frame(xx.current, VAR3 = VAR3.current, VAR4 = VAR4.current)
+xx.future <- data.frame(xx.future, VAR3 = VAR3.future, VAR4 = VAR4.future)
 
 # Rasterize the variables
-xx.ras.current <- rast(data.frame(x = rep(1:12, time = 12), 
-                                  y = rep(1:12, each = 12), 
-                                  aggregate(xx.current, by = list(ceiling(as.numeric(coord$x)), ceiling(as.numeric(coord$y))), mean)[,-c(1,2)]), 
-                       type="xyz", 
-                       crs = crs("epsg:4326"))
+xx.ras.current <- rast(data.frame(x = rep(1:12, time = 12)
+                                  , y = rep(1:12, each = 12)
+                                  , aggregate(xx.current, by = list(ceiling(as.numeric(coord$x))
+                                                                    , ceiling(as.numeric(coord$y)))
+                                              , mean)[, -c(1, 2)])
+                       , type = "xyz"
+                       , crs = crs("epsg:4326"))
 plot(xx.ras.current)
 
-xx.ras.future <- rast(data.frame(x = rep(1:12, time = 12),
-                                 y = rep(1:12, each = 12), 
-                                 aggregate(xx.future, by = list(ceiling(as.numeric(coord$x)), ceiling(as.numeric(coord$y))), mean)[,-c(1,2)]), 
-                      type="xyz", 
-                      crs = crs("epsg:4326"))
+xx.ras.future <- rast(data.frame(x = rep(1:12, time = 12)
+                                 , y = rep(1:12, each = 12)
+                                 , aggregate(xx.future, by = list(ceiling(as.numeric(coord$x))
+                                                                , ceiling(as.numeric(coord$y)))
+                                           , mean)[, -c(1, 2)])
+                      , type="xyz"
+                      , crs = crs("epsg:4326"))
 plot(xx.ras.future)
 ```
 ```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center'}
@@ -148,11 +126,11 @@ xx.current.samp <- xx.current[samp,]
 xx.future.samp <- xx.future[samp,]
 ```
 
-2.  Genome Scan 
+<br>
 
-    </h2>
+<h2>2. Genome Scan</h2>
 
-    <br>
+<br>
 
 <h4>2.1 Identifying loci under selection using RDA</h4>
 
@@ -251,13 +229,9 @@ Once the outliers have been identified, it can be useful to visualize their dist
 
 <br>
 
-<h2>
+<h2>3. Adaptive Index</h2>
 
-3.  Adaptive Index
-
-    </h2>
-
-    <br>
+<br>
 
 <h4>3.1. Adaptively enriched genetic space</h4>
 
@@ -332,13 +306,9 @@ ggplot(data = TAB_RDA) +
 
 <br>
 
-<h2>
+<h2>4. Genomic Offset</h2>
 
-4.  Genomic Offset
-
-    </h2>
-
-    <br>
+<br>
 
 <h4>4.1. Predicting population future maladaptation</h4>
 
@@ -426,13 +396,9 @@ This geographic genomic offset can then be compared to different fitness traits 
 
 <br>
 
-<h2>
+<h2>5. Loci Modules</h2>
 
-5.  Loci Modules
-
-    </h2>
-
-    <br>
+<br>
 
 We can find covarying sets of loci on the RDA space
 
@@ -458,13 +424,9 @@ ggplot() +
 
 <br>
 
-<h2>
+<h2>6. Adaptive groups</h2>
 
-6.  Adaptive groups
-
-    </h2>
-
-    <br>
+<br>
 
 The goal here is to identify groups of individuals with the same adaptive background
 
