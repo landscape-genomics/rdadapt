@@ -489,8 +489,7 @@ ggplot() +
         , strip.text = element_text(size = 11))
 
 ## Visualization on the landscape
-tab <- data.frame(coord.samp, cluster = groups$samples$cluster)
-plot(tab[, 1:2], col = tab$cluster)
+plot(coord.samp, cex = 0.2, xlim = c(0, 12), ylim = c(0, 12), col = groups$samples$cluster)
 
 ```
 
