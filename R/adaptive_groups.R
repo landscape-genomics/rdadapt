@@ -39,6 +39,7 @@
 ##' @importFrom factoextra hkmeans
 ##' @importFrom plyr ddply
 ##' @importFrom geometry inhulln convhulln
+##' @include rda_class.R
 ##' 
 ##' @export
 ##' 

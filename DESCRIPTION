@@ -27,3 +27,11 @@ RoxygenNote: 7.3.1
 Encoding: UTF-8
 VignetteBuilder: knitr
 LazyData: true
+Collate: 
+    'rda_class.R'
+    'adaptive_groups.R'
+    'adaptive_index.R'
+    'genomic_offset.R'
+    'loci_modules.R'
+    'rdadapt.R'
+    'rdadapt_data.R'

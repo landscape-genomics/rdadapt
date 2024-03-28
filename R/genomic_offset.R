@@ -40,7 +40,8 @@
 ##' 
 ##' @importFrom stats dist
 ##' @importFrom raster rasterToPoints rasterFromXYZ mask
-##' 
+##' @include rda_class.R
+##'  
 ##' @export
 ##' 
 ##'

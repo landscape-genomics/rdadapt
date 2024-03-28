@@ -32,6 +32,7 @@
 ##' 
 ##' @importFrom foreach foreach %do%
 ##' @importFrom terra crs rast as.data.frame mask
+##' @include rda_class.R
 ##' 
 ##' @export
 ##' 
