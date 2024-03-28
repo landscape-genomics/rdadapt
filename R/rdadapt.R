@@ -26,22 +26,28 @@
 ##' First, Mahalanobis distances are computed for all genetic marker using a robust estimate of both mean and covariance matrix between the \code{K} RDA vectors of loadings.
 ##' Then, to compute p-values, Mahalanobis distances are divided by a genomic inflation factor (\code{gif}), giving a scaled statistic that should follow a chi-squared distribution with \code{K} degrees of freedom. 
 ##' 
-##' @keywords 
-##' 
-##' @seealso 
-##' 
-##' @examples
+## @keywords 
+## 
+## @seealso 
+## 
+## @examples
 ##' 
 ##' 
 ##' @importFrom stats median qchisq pchisq
 ##' @importFrom robust covRob
 ##' @importFrom qvalue qvalue
-##' @importClassesFrom vegan rda
 ##' 
 ##' @export
 ##' 
 ##'
 ###################################################################################################
+
+## Class not exported by vegan, so initialized here
+setClass("rda", slots = c("colsum", "tot.chi", "Ybar"
+                          , "method", "call"
+                          , "pCCA", "CCA", "CA", "inertia"
+                          , "regularization", "terms", "terminfo"))
+
 
 
 setGeneric("rdadapt", def = function(RDA, K, scores) { standardGeneric( "rdadapt") })

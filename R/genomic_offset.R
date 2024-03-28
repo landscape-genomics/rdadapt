@@ -31,16 +31,15 @@
 ##' The euclidean distance between these two predictions in the RDA space provides an estimate of the change in genetic composition that would be required to track climate change.
 ##' 
 ##' 
-##' @keywords 
-##' 
-##' @seealso 
-##' 
-##' @examples
+## @keywords 
+## 
+## @seealso 
+## 
+## @examples
 ##' 
 ##' 
 ##' @importFrom stats dist
 ##' @importFrom raster rasterToPoints rasterFromXYZ mask
-##' @importFrom XX predict
 ##' 
 ##' @export
 ##' 

@@ -23,11 +23,11 @@
 ##' When projected on a map it allows visualizing the different adaptive gradients across a species range.
 ##' 
 ##' 
-##' @keywords 
-##' 
-##' @seealso 
-##' 
-##' @examples
+## @keywords 
+## 
+## @seealso 
+## 
+## @examples
 ##' 
 ##' 
 ##' @importFrom foreach foreach %do%

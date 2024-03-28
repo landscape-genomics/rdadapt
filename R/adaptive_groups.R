@@ -28,11 +28,11 @@
 ##' Next version will use more than two dimensions
 ##' 
 ##' 
-##' @keywords 
-##' 
-##' @seealso 
-##' 
-##' @examples
+## @keywords 
+## 
+## @seealso 
+## 
+## @examples
 ##' 
 ##' 
 ##' @importFrom raster rasterToPoints pointDistance
