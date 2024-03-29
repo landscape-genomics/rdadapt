@@ -13,27 +13,44 @@ adaptive_index(RDA, K, env, env_mask = NULL, method = "loadings")
 \S4method{adaptive_index}{rda,ANY,data.frame,missing}(RDA, K, env, method = "loadings")
 }
 \arguments{
-\item{RDA}{a RDA model from which to extract loci and environmental variable scores}
+\item{RDA}{a \code{RDA} model from which to extract loci and environmental variable scores}
 
-\item{K}{an integer specifying the number of RDA axes to use for the projection}
+\item{K}{an \code{integer} specifying the number of RDA axes to use for the projection}
 
-\item{env}{a stack of rasters or a data.frame with the environmental conditions of the sites to predict}
+\item{env}{a \code{RasterStack} object or a \code{data.frame} with the environmental 
+conditions of the sites to predict}
 
-\item{env_mask}{(\emph{optional, default} \code{NULL}) \cr a shapefile to limit the projection to a specific area}
+\item{env_mask}{(\emph{optional, default} \code{NULL}) \cr a \code{Raster} object to 
+limit the projection to a specific area}
 
-\item{method}{(\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages (scaling type 1) or the linear combinations (scaling type 2) of the projected environmental variables to predict site scores (i.e., adaptive index)}
+\item{method}{(\emph{default} \code{'loadings'}) \cr a \code{character} defining whether 
+the function is to use weighted averages (scaling type 1, \code{loadings}) or linear 
+combinations (scaling type 2, \code{predict}) of the projected environmental variables 
+to predict site scores (i.e., adaptive index)}
 }
 \value{
-A \code{raster stack} or a  \code{data.frame} containing the projections for the \code{K} first RDA axes
+A \code{RasterStack} object or a \code{data.frame} containing the projections for the 
+\code{K} first RDA axes
 }
 \description{
-The \code{adaptive_index} function allows the user to estimate the optimal adaptive genetic component for any combination of environmental conditions. 
-The function project that adaptive component onto the landscape.
+The \code{adaptive_index} function allows the user to estimate the optimal 
+adaptive genetic component for any combination of environmental conditions, and project it 
+onto the landscape.
 }
 \details{
-The adaptive index provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. 
-When projected on a map it allows visualizing the different adaptive gradients across a species range.
+The \emph{adaptive index} provides an estimate of adaptive genetic similarity or difference 
+of all pixels on the landscape as a function of the values of the environmental predictors 
+at that location. 
+When projected on a map, it allows visualizing the different adaptive gradients across a 
+species range.
 }
 \author{
 Thibaut Capblancq
 }
+\keyword{RDA,}
+\keyword{adaptive}
+\keyword{difference,}
+\keyword{genetic}
+\keyword{index,}
+\keyword{projection}
+\keyword{similarity,}

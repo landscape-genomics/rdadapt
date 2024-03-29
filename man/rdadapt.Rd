@@ -16,27 +16,43 @@ rdadapt(RDA, K, scores)
 \S4method{rdadapt}{missing,missing,matrix}(scores)
 }
 \arguments{
-\item{RDA}{a RDA model from which to extract loci loadings}
+\item{RDA}{a \code{RDA} model from which to extract loci loadings}
 
-\item{K}{an integer specifying the number of RDA axes to use for the detection}
+\item{K}{an \code{integer} specifying the number of RDA axes to use for the detection}
 }
 \value{
 A \code{data.frame} containing :
 \itemize{
   \item \code{p.values} : the p-value associated with each locus
-  \item \code{q.values} : the q-value associated with each locus, estimated using the \code{q.values} package and allowing to use a FDR (False Discovery Rate) approach instead of a p-value threshold to identify outliers.
+  \item \code{q.values} : the q-value associated with each locus, estimated using the 
+  \pkg{qvalue} package and allowing to use a FDR (false discovery rate) approach instead 
+  of a p-value threshold to identify outliers.
 }
 }
 \description{
 The \code{rdadapt} function performs redundancy analysis and computes p-values to
 test for outliers based on loci extremeness along a distribution of Mahalanobis distances 
 estimated between each locus and the center of the RDA space using a certain number of axes (K). 
-\code{rdadapt} accommodates individual genotypes or allele frequencies.
+It accommodates individual genotypes or allele frequencies.
 }
 \details{
-First, Mahalanobis distances are computed for all genetic marker using a robust estimate of both mean and covariance matrix between the \code{K} RDA vectors of loadings.
-Then, to compute p-values, Mahalanobis distances are divided by a genomic inflation factor (\code{gif}), giving a scaled statistic that should follow a chi-squared distribution with \code{K} degrees of freedom.
+First, \emph{Mahalanobis distances} are computed for all genetic markers using a robust estimate 
+of both mean and covariance matrix between the \code{K} RDA vectors of loadings.
+Then, to compute p-values, Mahalanobis distances are divided by a GIF 
+(\emph{genomic inflation factor}), giving a scaled statistic that should follow a chi-squared 
+distribution with \code{K} degrees of freedom.
+}
+\seealso{
+\code{\link[robust]{covRob}}, \code{\link[qvalue]{qvalue}}
 }
 \author{
 Thibaut Capblancq
 }
+\keyword{Mahalanobis}
+\keyword{RDA,}
+\keyword{covariance,}
+\keyword{distances,}
+\keyword{factor}
+\keyword{genomic}
+\keyword{inflation}
+\keyword{loadings,}

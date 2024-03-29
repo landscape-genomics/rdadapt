@@ -4,36 +4,48 @@
 ##' 
 ##' @title Predict temporal or geographic genomic offset
 ##' 
-##' @description The \code{genomic_offset} function allows the user to predict genomic offset from a RDA model.
-##' \code{adaptive_groups} can estimate both temporal or spatial genomic offset and accommodates raster data or discrete populations.
+##' @description The \code{genomic_offset} function allows the user to predict genomic offset 
+##' from a RDA model. The \code{adaptive_groups} function can estimate both temporal or spatial 
+##' genomic offset and accommodates raster data or discrete populations.
 ##' 
-##' @param RDA a RDA model from which to extract loci and environmental variable scores
-##' @param K an integer specifying the number of RDA axes to use for the projection
-##' @param env_pres a stack of rasters or a data.frame with the environmental conditions in the present
-##' @param env_fut a stack of rasters or a data.frame with the environmental conditions in the present
-##' @param env_mask (\emph{optional, default} \code{NULL}) \cr a shapefile to limit the projection to a specific area
-##' @param method  (\emph{default} \code{'loadings'}) \cr the function can either use the weighted averages (scaling type 1) or the linear combinations (scaling type 2) of the projected environmental variables to predict site scores (i.e., adaptive index)
+##' @param RDA a \code{RDA} model from which to extract loci and environmental variable scores
+##' @param K an \code{integer} specifying the number of RDA axes to use for the projection
+##' @param env_pres a \code{RasterStack} object or a \code{data.frame} with the environmental 
+##' conditions in the present
+##' @param env_fut a \code{RasterStack} object or a \code{data.frame} with the environmental 
+##' conditions in the future
+##' @param env_mask (\emph{optional, default} \code{NULL}) \cr a \code{Raster} object to limit 
+##' the projection to a specific area
+##' @param method  (\emph{default} \code{'loadings'}) \cr a \code{character} defining whether 
+##' the function is to use weighted averages (scaling type 1, \code{loadings}) or linear 
+##' combinations (scaling type 2, \code{predict}) of the projected environmental variables 
+##' to predict site scores (i.e., adaptive index)
 ##' 
 ##' 
 ##' @return  
 ##' 
-##' ##' A \code{list} containing :
+##' A \code{list} containing :
 ##' \itemize{
-##'   \item \code{genomic_offset} : a \code{raster stack} or a  \code{data.frame} containing the genomic offset predictions for the \code{K} first RDA axes, as well as the overall genomic offset prediction.
-##'   \item \code{weights} : the weights associated with each RDA axis used for the predicitons
+##'   \item \code{genomic_offset} : a \code{RasterStack} or a \code{data.frame} containing 
+##'   the genomic offset predictions for the \code{K} first RDA axes, as well as the overall 
+##'   genomic offset prediction
+##'   \item \code{weights} : the weights associated with each RDA axis used for the predictions
 ##' }
 ##' 
 ##' 
 ##' @details
 ##' 
-##' The RDA-based method to predict genomic offset is relatively simple. 
-##' RDA is first used to predict the optimal adaptive genetic composition for each environmental pixel under consideration (\code{adaptive_index} function), using both current and future environmental conditions. 
-##' The euclidean distance between these two predictions in the RDA space provides an estimate of the change in genetic composition that would be required to track climate change.
+##' This RDA-based method to predict \emph{genomic offset} is relatively simple. 
+##' RDA is first used to predict the \emph{optimal adaptive genetic composition} for each 
+##' environmental pixel under consideration (see \code{\link{adaptive_index}} function), 
+##' using both current and future environmental conditions. 
+##' The \emph{euclidean distance} between these two predictions in the RDA space provides an 
+##' estimate of the change in genetic composition that would be required to track climate change.
 ##' 
 ##' 
-## @keywords 
+##' @keywords RDA, genomic offset, adaptive index, projection
 ## 
-## @seealso 
+##' @seealso \code{\link{adaptive_index}}
 ## 
 ## @examples
 ##' 
