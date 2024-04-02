@@ -5,7 +5,7 @@ R package `rdadapt` was developed to facilitate the exploration and projection o
 
 A tutorial for `rdadatpt` is available on this website.
 
-News: A paper is in preparation describing version 1 of rdadapt.
+**News:** A paper is in preparation describing version 1 of rdadapt.
 
 ## Installation
 

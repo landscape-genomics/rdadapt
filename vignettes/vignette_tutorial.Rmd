@@ -64,14 +64,19 @@ names(maladapt)
 
 <h4>1.1 Metadata </h4>
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 8, fig.width= 8}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 ## Population labels
 pop <- maladapt$pop
 
 ## Individual coordinates
 coord <- maladapt$coord
-plot(coord, cex = 0.2, xlim = c(0, 12), ylim = c(0, 12))
+```
 
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 5, echo=FALSE}
+plot(coord, cex = 0.2, xlim = c(0, 12), ylim = c(0, 12))
+```
+
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 ## Genotypes
 Y <- maladapt$Y
 Y[1:5, 1:5]
@@ -88,8 +93,13 @@ xx.ras.current <- rast(data.frame(x = rep(1:12, time = 12)
                                               , mean)[, -c(1, 2)])
                        , type = "xyz"
                        , crs = crs("epsg:4326"))
-plot(xx.ras.current)
+```
 
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 6, fig.width= 6, echo=FALSE}
+plot(xx.ras.current)
+```
+
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 xx.ras.future <- rast(data.frame(x = rep(1:12, time = 12)
                                  , y = rep(1:12, each = 12)
                                  , aggregate(xx.future, by = list(ceiling(coord$x)
@@ -97,12 +107,15 @@ xx.ras.future <- rast(data.frame(x = rep(1:12, time = 12)
                                            , mean)[, -c(1, 2)])
                       , type = "xyz"
                       , crs = crs("epsg:4326"))
+```
+
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 8, fig.width= 6, echo=FALSE}
 plot(xx.ras.future)
 ```
 
 <h4>1.2 Subsample populations</h4>
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 5}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 ## Randomly select only 25 populations to mimic an empirical dataset
 samp <- which(pop %in% sample(1:100, 25, replace = FALSE))
 
@@ -110,7 +123,9 @@ Y.samp <- Y[samp, ]
 xx.current.samp <- xx.current[samp, ]
 xx.future.samp <- xx.future[samp, ]
 coord.samp <- coord[samp, ]
+```
 
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 5, echo=FALSE}
 plot(coord.samp, cex = 0.2, xlim = c(0, 12), ylim = c(0, 12), col = "red")
 ```
 
@@ -157,13 +172,13 @@ Once the outliers have been identified, it can be useful to visualize their dist
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 5, echo=FALSE}
 ## Formatting table for ggplot
-locus_scores <- as.data.frame(scores(rdadapt_env, choices=c(1:2), display="species", scaling="none"))
+locus_scores <- as.data.frame(scores(RDA_env, choices=c(1:2), display="species", scaling="none"))
 TAB_loci <- data.frame(names = row.names(locus_scores), locus_scores)
 TAB_loci$type <- "Neutral"
-TAB_loci$type[TAB_loci$names%in%outliers$Loci] <- "All outliers"
+TAB_loci$type[outliers] <- "Outliers"
 TAB_loci$type <- factor(TAB_loci$type, levels = c("Neutral", "Outliers"))
 TAB_loci <- TAB_loci[order(TAB_loci$type),]
-TAB_var <- as.data.frame(scores(rdadapt_env, choices=c(1,2), display="bp")) 
+TAB_var <- as.data.frame(scores(RDA_env, choices=c(1,2), display="bp")) 
 
 ## Biplot of RDA loci and variables scores
 ggplot() +
@@ -287,7 +302,7 @@ res_RDA_proj <- genomic_offset(RDA = RDA_outliers
 
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=5, echo=FALSE}
 ## Table global genetic offset
 RDA_proj_offset <- as.data.frame(res_RDA_proj$Proj_offset_global, xy = TRUE)
 
