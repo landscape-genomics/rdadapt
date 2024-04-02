@@ -17,13 +17,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 In the following, we show how the `rdadapt` package can perform:
 
-+ genome scans for selection,
-+ adaptive index projection on the landscape,
-+ estimation of genomic offsets
-+ identification of co-varying modules of adaptive loci or 
-+ identification of adaptive groups of individual or populations.
+-   genome scans for selection,
+-   adaptive index projection on the landscape,
+-   estimation of genomic offsets
+-   identification of co-varying modules of adaptive loci or
+-   identification of adaptive groups of individual or populations.
 
-We show how to run the package using data simulated with Slim3 as described in [Gain et al. 2023](https://doi.org/10.1093/molbev/msad140). `maladapt` dataset contains genotypes (*Y*) for 2036 simulated individuals on a 12\*12 grid constrained by two causal environmental variables (*Var1* and *Var2*). Fitness (*fitness*) was measured for all individuals before and after a brutal change in environment.
+We show how to run the package using data simulated with Slim3 as described in [Gain et al. 2023](https://doi.org/10.1093/molbev/msad140).
+
+The `maladapt` dataset contains genotypes (*Y*) for 2036 simulated individuals on a 12\*12 grid constrained by two causal environmental variables (*Var1* and *Var2*). Fitness (*fitness*) was measured for all individuals before and after a brutal change in environment.
 
 To run the package, you need to install it (and load it) using the following command lines:
 
@@ -49,7 +51,11 @@ library(plyr)
 
 <br>
 
-<h2>1. Data Preparation</h2>
+<h2>
+
+1.  Data Preparation
+
+    </h2>
 
 <br>
 
@@ -62,7 +68,7 @@ names(maladapt)
 
 <br>
 
-<h4>1.1 Metadata </h4>
+<h4>1.1 Metadata</h4>
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 ## Population labels
@@ -113,7 +119,7 @@ xx.ras.future <- rast(data.frame(x = rep(1:12, time = 12)
 plot(xx.ras.future)
 ```
 
-<h4>1.2 Subsample populations</h4>
+<h4>1.2 Sub-sample populations</h4>
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 ## Randomly select only 25 populations to mimic an empirical dataset
@@ -131,18 +137,24 @@ plot(coord.samp, cex = 0.2, xlim = c(0, 12), ylim = c(0, 12), col = "red")
 
 <br>
 
-<h2>2. Genome Scan</h2>
+<h2>
+
+2.  Genome Scan
+
+    </h2>
 
 <br>
 
 <h4>2.1 Identifying loci under selection using RDA</h4>
+
+The first step to identify loci particularly associated with environmental variation is to regress the genetic matrix against the environmental predictors using RDA model.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 6}
 RDA_env <- rda(Y ~ .,  xx.current)
 plot(RDA_env)
 ```
 
-We then have to *choose a number of RDA axes to include* when conducting the genome scan.
+We then have to choose a number of RDA axes to include when conducting the genome scan.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 6}
 screeplot(RDA_env, main = "Eigenvalues of constrained axes")
@@ -155,7 +167,7 @@ Looking at the proportion of variance explained by each axis, we decided to use 
 rdadapt_env <- rdadapt(RDA = RDA_env, K = 2)
 ```
 
-One critical step when conducting a genome scan is to *set a pertinent p-value threshold to identify the outlier loci*. Here, we used a *Bonferroni correction* to account for multiple testing.
+One critical step when conducting a genome scan is to set a pertinent p-value threshold to identify the outlier loci. Here, we used a *Bonferroni correction* to account for multiple testing.
 
 ```{r, message=FALSE, eval=TRUE}
 ## P-values threshold after Bonferroni correction
@@ -168,7 +180,7 @@ length(outliers)
 
 The function found 215 outliers.
 
-Once the outliers have been identified, it can be useful to visualize their distribution in comparison with neutral loci, using either a RDA biplot or a Manhattan plot.
+Once the outliers have been identified, it can be useful to visualize their distribution in comparison with neutral loci using either a RDA biplot.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 5, echo=FALSE}
 ## Formatting table for ggplot
@@ -184,7 +196,7 @@ TAB_var <- as.data.frame(scores(RDA_env, choices=c(1,2), display="bp"))
 ggplot() +
   geom_hline(yintercept=0, linetype="dashed", color = gray(.80), size=0.6) +
   geom_vline(xintercept=0, linetype="dashed", color = gray(.80), size=0.6) +
-  geom_point(data = TAB_loci, aes(x=RDA1*20, y=RDA2*20, colour = type), size = 1.4) +
+  geom_point(data = TAB_loci, aes(x=RDA1*20, y=RDA2*20, colour = type), size = 1.4, alpha = 0.7) +
   scale_color_manual(values = c("gray90", "#EB8055FF")) +
   geom_segment(data = TAB_var, aes(xend=RDA1, yend=RDA2, x=0, y=0), colour="black", size=0.15, linetype=1, arrow=arrow(length = unit(0.02, "npc"))) +
   geom_text(data = TAB_var, aes(x=1.1*RDA1, y=1.1*RDA2, label = row.names(TAB_var)), size = 2.5, family = "Times") +
@@ -199,20 +211,24 @@ ggplot() +
 
 <br>
 
-<h2>3. Adaptive Index</h2>
+<h2>
+
+3.  Adaptive Index
+
+    </h2>
 
 <br>
 
 <h4>3.1 Adaptively enriched genetic space</h4>
 
-The 91 putative adaptive loci can be used as multivariate response in a new “adaptively enriched” RDA, using the 9 selected bioclimatic variables as explanatory variables.
+The 215 putative adaptive loci can be used as multivariate response in a new “adaptively enriched” RDA, using the same environmental predictors as explanatory variables.
 
 ```{r, message=FALSE, eval=TRUE}
 ## Adaptively enriched RDA
 RDA_outliers <- rda(Y[, outliers] ~ .,  xx.current)
 ```
 
-A RDA biplot allows us to visualize the relationship between the 91 putative adaptive loci and the underlying climatic variables.
+A RDA biplot allows us to visualize the relationship between the outlier loci and the underlying environmental predictors.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 7, echo=FALSE}
 TAB_loci <- as.data.frame(scores(RDA_outliers, choices = c(1:2), display = "species", scaling="none"))
@@ -224,7 +240,7 @@ ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed",  color = gray(.80), size = 0.6) +
   geom_point(data = TAB_loci
              , aes(x = RDA1 * 3, y = RDA2 * 3)
-             , colour = "#6B4596FF", size = 2) +
+             , colour = "#6B4596FF", size = 2, alpha = 0.7) +
   geom_segment(data = TAB_var
                , aes(xend = RDA1, yend = RDA2, x = 0, y = 0)
                , colour = "black", size = 0.15, linetype = 1
@@ -284,13 +300,17 @@ ggplot(data = TAB_RDA, aes(x = x, y = y, fill = value_cut)) +
 
 <br>
 
-<h2>4. Genomic Offset</h2>
+<h2>
+
+4.  Genomic Offset
+
+    </h2>
 
 <br>
 
 <h4>4.1 Predicting population future maladaptation</h4>
 
-Once the genetic \~ environment relationship is characterized, it can be extrapolated to future environments to predict a potential shift in adaptive optimum induced by climate change.The RDA-based method to predict this future maladaptation is relatively simple. As done above, RDA can be used to predict the optimal adaptive genetic composition for each environmental pixel under consideration (Adaptive Index in Section 5), using both current and future environmental conditions. The difference between the two predictions provides an estimate of the change in genetic composition that would be required to track climate change.
+Once the genetic \~ environment relationship is characterized, it can be extrapolated to future environments to predict a potential shift in adaptive optimum induced by climate change.The RDA-based method to predict this future maladaptation is relatively simple. As done above, RDA can be used to predict the optimal adaptive genetic composition for each environmental site under consideration, using both current and future environmental conditions. The difference between the two predictions provides an estimate of the change in genetic composition that would be required to track climate change.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10}
 ## Projecting the adaptive landscape after the change in environment 
@@ -331,13 +351,22 @@ fitness.future <- rast(data.frame(x = rep(1:12, time = 12)
                                               , mean)[, -c(1, 2)])
                        , type = "xyz"
                        , crs = crs("epsg:4326"))
-
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=7, echo=FALSE}
-plot(log(fitness.future[]) ~ RDA_proj_offset$Global_offset)
-
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=5, echo=FALSE}
+TAB <- data.frame(GO = RDA_proj_offset$Global_offset, Fitness = as.numeric(fitness.future[]))
+ggplot(data = TAB, aes(x=GO, y=Fitness)) +
+  geom_point(size = 2, alpha = 0.7) +
+  geom_smooth(method = "lm", color = "#FCA636FF", size = 1) +
+  labs(x = "Genomic Offset", y = "Fitness", subtitle = "Fitness ~ genomic offset") +
+  theme_bw(base_size = 12, base_family = "Times") +
+  theme(panel.grid = element_blank()
+        , plot.background = element_blank()
+        , panel.background = element_blank()
+        , strip.text = element_text(size = 11))
 ```
+
+The genomic offset predictions are negatively correlated with fitness in the population
 
 <br>
 
@@ -400,16 +429,19 @@ ggplot() +
 
 Based on the adaptively enriched RDA space, we estimated a genomic offset between each source individual and the common garden climatic conditions.
 
-
 This geographic genomic offset can then be compared to different fitness traits in the garden to estimate the impact of this predicted maladaptation on seedling fitness. We can also compare the influence of genomic offset on fitness with the impact of a basic climate transfer distance estimated between each source population and the garden from the climatic variables only (using Mahalanobis distance).
 
 <br>
 
-<h2>5. Loci Modules</h2>
+<h2>
+
+5.  Loci Modules
+
+    </h2>
 
 <br>
 
-We can find covarying sets of loci on the RDA space
+RDA models can also be used to find covarying sets of loci using the \\{loci_modules} function.
 
 ```{r, message=FALSE, results='hide', eval=TRUE}
 ## Groups the outlier loci into two modules
@@ -427,71 +459,63 @@ ggplot() +
   scale_fill_viridis(guide = "none", discrete = TRUE, direction = -1, alpha = 0.2) +
   scale_color_viridis(guide = "none", discrete = TRUE, direction = -1, alpha = 0.7) +
   labs(x = "Absolute score on RDA1", y = "Absolute score on RDA2", subtitle = "Modules of outlier loci") +
-  theme_bw(base_size = 12, base_family = "Times") +
+  theme_bw(base_size = 11, base_family = "Times") +
   theme(panel.grid = element_blank()
         , plot.background = element_blank()
-        , panel.background = element_blank()
-        , strip.text = element_text(size = 11))
+        , panel.background = element_blank())
 ```
 
 <br>
 
-<h2>6. Adaptive groups</h2>
+<h2>
+
+6.  Adaptive groups
+
+    </h2>
 
 <br>
 
-The goal here is to identify groups of individuals with the same adaptive background
-
+The \code{adaptive_groups} function allows the user to find groups of covarying individuals or populations based on their scores in the RDA space and a hkmean clustering procedure.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 ## New RDA model with only sample populations and outlier loci
 RDA_samp <- rda(Y.samp[,outliers] ~ .,  xx.current.samp)
 
 ## Finds N optimal groups among the individuals used to build the adaptive RDA space
-groups <- adaptive_groups(RDA = RDA_samp, K = 2, nb_clusters = 2)
+groups <- adaptive_groups(RDA = RDA_samp, K = 2, nb_clusters = 3)
 ```
 
 ```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center', fig.align='center', fig.height = 4, fig.width= 5, echo=FALSE}
-## Visualization in the RDA space
-ggplot() +
-  geom_polygon(data = groups$polygons
-               , aes(x = x, y = y, colour = factor(cluster)
-                     , fill = factor(cluster)), alpha = 0.2) +
-  geom_point(data = groups$samples
-             , aes(x = x, y = y, colour = factor(cluster)
-                   , fill = factor(cluster)), size = 2, alpha = 0.7) +
-  scale_fill_viridis(guide = "none", discrete = TRUE, direction = -1, alpha = 0.2) +
-  scale_color_viridis(guide = "none", discrete = TRUE, direction = -1, alpha = 0.7) +
-  labs(x = "Score on RDA1", y = "Score on RDA2", subtitle = "Adaptive groups") +
-  theme_bw(base_size = 12, base_family = "Times") +
+## Visualization on the landscape
+TAB <- data.frame(coord.samp, cluster = groups$samples$cluster)
+
+ggplot(TAB, aes(x = x, y = y, color = factor(cluster))) +
+  geom_point(size = 2, alpha = 0.7) +
+  scale_color_viridis(guide = "none", discrete = TRUE, direction = -1) +
+  labs(x = "Longitude", y = "Latitude", subtitle = "Adaptive groups") +
+  theme_bw(base_size = 11, base_family = "Times") +
   theme(panel.grid = element_blank()
         , plot.background = element_blank()
-        , panel.background = element_blank()
-        , strip.text = element_text(size = 11))
-
-## Visualization on the landscape
-plot(coord.samp, cex = 0.2, xlim = c(0, 12), ylim = c(0, 12), col = groups$samples$cluster)
-
+        , panel.background = element_blank())
 ```
+
+\code{adaptive_groups} accommodates discrete populations as above, or stack of rasters as below.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 5}
 ## Finds N groups on the adaptive landscape projected from the RDA model
 groups <- adaptive_groups(RDA = RDA_samp, K = 2, env = xx.ras.current, nb_clusters = 9)
+```
 
-## Visualization in the RDA space
-ggplot() +
-  geom_polygon(data = groups$polygons
-               , aes(x = x, y = y, colour = factor(cluster)
-                     , fill = factor(cluster)), alpha = 0.2) +
-  geom_point(data = groups$samples
-             , aes(x = x, y = y, colour = factor(cluster)
-                   , fill = factor(cluster)), size = 2, alpha = 0.7) +
-  scale_fill_viridis(guide = "none", discrete = TRUE, direction = -1, alpha = 0.2) +
-  scale_color_viridis(guide = "none", discrete = TRUE, direction = -1, alpha = 0.7) +
-  labs(x = "Score on RDA1", y = "Score on RDA2", subtitle = "Adaptive groups") +
-  theme_bw(base_size = 12, base_family = "Times") +
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 5}
+## Visualization of the adaptive groups on the landscape
+ggplot(data = groups$samples) + 
+  geom_raster(aes(x = x, y = y, fill = as.factor(cluster))) + 
+  scale_fill_viridis_d(guide = "none") +
+  labs(x = "Longitude", y = "Latitude", subtitle = "Adaptive groups") +
+  theme_bw(base_size = 11, base_family = "Times") +
   theme(panel.grid = element_blank()
         , plot.background = element_blank()
-        , panel.background = element_blank()
-        , strip.text = element_text(size = 11))
+        , panel.background = element_blank())
 ```
+
+The function was initially designed to identify conservation units or seed zones across the range of a species.
