@@ -38,6 +38,13 @@ library(ggplot2)
 library(viridis)
 library(factoextra)
 library(reshape2)
+
+## Do we have to keep those here?
+library(terra)
+library(qvalue)
+library(vegan)
+library(foreach)
+library(plyr)
 ```
 
 <br>
@@ -193,8 +200,8 @@ RDA_outliers <- rda(Y[, outliers] ~ .,  xx.current)
 A RDA biplot allows us to visualize the relationship between the 91 putative adaptive loci and the underlying climatic variables.
 
 ```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 3, fig.width= 3}
-TAB_loci <- scores(RDA_outliers, choices = c(1:2), display = "species", scaling="none")
-TAB_var <- scores(RDA_outliers, choices = c(1:2), display = "bp")
+TAB_loci <- as.data.frame(scores(RDA_outliers, choices = c(1:2), display = "species", scaling="none"))
+TAB_var <- as.data.frame(scores(RDA_outliers, choices = c(1:2), display = "bp"))
 
 ## RDA biplot
 ggplot() +
@@ -210,7 +217,7 @@ ggplot() +
   geom_text(data = TAB_var
             , aes(x = 1.1 * RDA1, y = 1.1 * RDA2, label = row.names(TAB_var))
             , size = 2.5, family = "Times") +
-  labs(x = "RDA 1 (XX%)", y = "RDA 2 (XX%)", subtitle = "Adaptively enriched RDA space") +
+  labs(x = "RDA 1 (51%)", y = "RDA 2 (48%)", subtitle = "Adaptively enriched RDA space") +
   theme_bw(base_size = 11, base_family = "Times") +
   theme(panel.grid = element_blank()
         , plot.background = element_blank()
