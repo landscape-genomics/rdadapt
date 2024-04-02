@@ -1,3 +1,4 @@
+
 # rdadapt
 
 R package `rdadapt` was developed to facilitate the exploration and projection of the gene \~ environment relationship across current and future landscapes. The package provides various statistical tools to conduct **landscape genomic analyses** going from identifying the genetic bases of adaptation within a species to predict future population (mal)adaptation to climate change.
@@ -6,7 +7,7 @@ A tutorial for `rdadatpt` is available on this website.
 
 News: A paper is in preparation describing version 1 of rdadapt.
 
-# Installation
+## Installation
 
 ```
 # From Github
@@ -14,7 +15,7 @@ library(devtools)
 install_github("landscape-genomics/rdadapt")
 ````
 
-# References 
+## References 
 
 *The rdadapt package was inspired from various studies:*
 
