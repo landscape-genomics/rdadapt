@@ -156,7 +156,7 @@ plot(RDA_env)
 
 We then have to choose a number of RDA axes to include when conducting the genome scan.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 6}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 6}
 screeplot(RDA_env, main = "Eigenvalues of constrained axes")
 ```
 
@@ -182,7 +182,7 @@ The function found 215 outliers.
 
 Once the outliers have been identified, it can be useful to visualize their distribution in comparison with neutral loci using either a RDA biplot.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 5, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 6, echo=FALSE}
 ## Formatting table for ggplot
 locus_scores <- as.data.frame(scores(RDA_env, choices=c(1:2), display="species", scaling="none"))
 TAB_loci <- data.frame(names = row.names(locus_scores), locus_scores)
@@ -230,7 +230,7 @@ RDA_outliers <- rda(Y[, outliers] ~ .,  xx.current)
 
 A RDA biplot allows us to visualize the relationship between the outlier loci and the underlying environmental predictors.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 7, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width = 6, echo=FALSE}
 TAB_loci <- as.data.frame(scores(RDA_outliers, choices = c(1:2), display = "species", scaling="none"))
 TAB_var <- as.data.frame(scores(RDA_outliers, choices = c(1:2), display = "bp"))
 
@@ -274,7 +274,7 @@ res_RDA_proj_current <- adaptive_index(RDA = RDA_outliers
 
 The adaptive index thus provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. When projected on a map it allows visualizing the different adaptive gradients across a species range.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width=10, echo=FALSE}
 TAB_RDA <- as.data.frame(res_RDA_proj_current, xy = TRUE)
 for (i in 3:ncol(TAB_RDA)) {
   TAB_RDA[, i] <- (TAB_RDA[, i] - min(TAB_RDA[, i])) / (max(TAB_RDA[, i]) - min(TAB_RDA[, i]))
@@ -323,7 +323,7 @@ res_RDA_proj <- genomic_offset(RDA = RDA_outliers
 
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=7, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width=7, echo=FALSE}
 ## Table global genetic offset
 RDA_proj_offset <- as.data.frame(res_RDA_proj$Proj_offset_global, xy = TRUE)
 
@@ -353,7 +353,7 @@ fitness.future <- rast(data.frame(x = rep(1:12, time = 12)
                        , crs = crs("epsg:4326"))
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=5, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width=6, echo=FALSE}
 TAB <- data.frame(GO = RDA_proj_offset$Global_offset, Fitness = as.numeric(fitness.future[]))
 ggplot(data = TAB, aes(x=GO, y=Fitness)) +
   geom_point(size = 2, alpha = 0.7) +
@@ -506,7 +506,7 @@ ggplot(TAB, aes(x = x, y = y, color = factor(cluster))) +
 groups <- adaptive_groups(RDA = RDA_samp, K = 2, env = xx.ras.current, nb_clusters = 9)
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 5}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width=5, echo=FALSE}
 ## Visualization of the adaptive groups on the landscape
 ggplot(data = groups$samples) + 
   geom_raster(aes(x = x, y = y, fill = as.factor(cluster))) + 
@@ -518,4 +518,4 @@ ggplot(data = groups$samples) +
         , panel.background = element_blank())
 ```
 
-The function was initially designed to identify conservation units or seed zones across the range of a species.
+Here the adaptive landscape is very continuous so it looks more like discretizing a continuous distribution, adaptive indices or genomic offset are probably more appropriate. However, this functionality can become handy for management or conservation purposes, for example to identify conservation units or seed zones across the range of a species.
