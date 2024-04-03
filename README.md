@@ -19,8 +19,8 @@ install_github("landscape-genomics/rdadapt")
 
 *The rdadapt package was inspired from various studies:*
 
-- [Capblancq et al. 2018](http://dx.doi.org/10.1101/849406)
-- [Capblancq et al. 2020](https://doi.org/10.1111/jeb.13610)
-- [Capblancq & Forester 2021](http://dx.doi.org/10.1111/2041-210x.13722)
-- [Capblancq et al. 2023](http://dx.doi.org/10.1111/nph.18465)
-- [Hoste et al. 2023](http://dx.doi.org/10.1038/s41437-023-00661-2)
+- Capblancq T., Luu K., Blum M.G. & Bazin E. (2018) [Evaluation of redundancy analysis to identify signature of local adaptation](https://doi.org/10.1111/1755-0998.12906). Molecular Ecology Ressources 18(2): 1223-1233. 
+- Capblancq T., Morin X., Gueguen M., Renaud J., Lobreaux S. & Bazin E. (2020) [Climate associated genetic variation in Fagus sylvatica and potential responses to climate change in the French Alps](https://doi.org/10.1111/jeb.13610). Journal of Evolutionary Biology 33(6): 783-796. 
+- Capblancq T. & Forester B. (2021) [Redundancy Analysis: a Swiss Army knife for landscape genomics](https://doi.org/10.1111/2041-210X.13722). Methods in Ecology and Evolution 12(12): 2298-2309. 
+- Capblancq T., Lachmuth S., FitzpatrickK M. C., & Keller S. R. (2023) [From common garden to candidate genes: exploring local adaptation to climate in red spruce](https://doi.org/10.1111/nph.18465). New Phytologist 237 (5), 1590-1605. 
+- Hoste A., Capblancq T., Broquet T., *et al.* (2024) [Projection of current and future distribution of adaptive genetic units in an alpine ungulate](http://dx.doi.org/10.1038/s41437-023-00661-2). Heredity 132, 54–66.

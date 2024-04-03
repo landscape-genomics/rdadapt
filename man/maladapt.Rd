@@ -5,7 +5,7 @@
 \alias{maladapt}
 \title{Maladaptation tutorial}
 \format{
-A \code{list} object with 3 elements:
+A \code{list} object with 8 elements:
 \describe{
   \item{pop}{a \code{vector} identifying population for 2036 individuals}
   \item{coord}{a \code{data.frame} containing coordinates for 2036 individuals}
@@ -15,9 +15,9 @@ A \code{list} object with 3 elements:
 variables for 2036 individuals}
   \item{xx.future}{a \code{data.frame} containing 4 future environmental 
 variables for 2036 individuals}
-  \item{causal1}{a \code{vector} identifying ...}
-  \item{causal2}{a \code{vector} identifying ...}
-  \item{fitness}{a \code{data.frame} containing ...}
+  \item{causal1}{a \code{vector} identifying the loci under selection for Var1}
+  \item{causal2}{a \code{vector} identifying the loci under selection for Var2}
+  \item{fitness}{a \code{data.frame} containing the fitness of the individuals after a brutal change in environment}
 }
 }
 \usage{
