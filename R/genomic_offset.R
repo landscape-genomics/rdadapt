@@ -5,7 +5,7 @@
 ##' @title Predict temporal or geographic genomic offset
 ##' 
 ##' @description The \code{genomic_offset} function allows the user to predict genomic offset 
-##' from a RDA model. The \code{adaptive_groups} function can estimate both temporal or spatial 
+##' from a RDA model. The \code{genomic_offset} function can estimate both temporal or spatial 
 ##' genomic offset and accommodates raster data or discrete populations.
 ##' 
 ##' @param RDA a \code{RDA} model from which to extract loci and environmental variable scores
