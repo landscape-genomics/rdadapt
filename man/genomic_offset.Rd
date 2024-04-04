@@ -53,7 +53,7 @@ A \code{list} containing :
 }
 \description{
 The \code{genomic_offset} function allows the user to predict genomic offset 
-from a RDA model. The \code{adaptive_groups} function can estimate both temporal or spatial 
+from a RDA model. The \code{genomic_offset} function can estimate both temporal or spatial 
 genomic offset and accommodates raster data or discrete populations.
 }
 \details{
