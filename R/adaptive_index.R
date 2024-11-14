@@ -105,6 +105,10 @@ setMethod('adaptive_index', signature(RDA = "rda", env = "SpatRaster"), function
   }
   env_crs <- crs(env)
   env_df <- as.data.frame(env[[var_names]], xy = TRUE)
+  if (any(is.na(env_df))) {
+    env_df <- na.exclude(env_df)
+    warning("\n env contained NA values which have been removed")
+  }
   env_xy <- env_df[, c("x", "y")]
   env_var <- env_df[, var_names]
   
