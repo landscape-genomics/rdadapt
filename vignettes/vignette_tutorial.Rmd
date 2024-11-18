@@ -33,20 +33,14 @@ To run the package, you need to install it (and load it) using the following com
 library(devtools)
 install_github("landscape-genomics/rdadapt")
 library(rdadapt)
+library(vegan) ## rda
 
 ## Other libraries essentially used for plotting purposes
-library(robust)
+library(terra)
+library(reshape2)
 library(ggplot2)
 library(viridis)
-library(factoextra)
-library(reshape2)
-
-## Do we have to keep those here?
-library(terra)
-library(qvalue)
-library(vegan)
-library(foreach)
-library(plyr)
+library(wesanderson)
 ```
 
 <br>
@@ -78,7 +72,7 @@ pop <- maladapt$pop
 coord <- maladapt$coord
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 6, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=5, fig.width=6, fig.alt='Individual coordinates'}
 plot(coord, cex = 0.2, xlim = c(0, 12), ylim = c(0, 12))
 ```
 
@@ -101,7 +95,7 @@ xx.ras.current <- rast(data.frame(x = rep(1:12, time = 12)
                        , crs = crs("epsg:4326"))
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 6, fig.width= 6, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=6, fig.width=6, fig.alt='Current climate'}
 plot(xx.ras.current)
 ```
 
@@ -115,7 +109,7 @@ xx.ras.future <- rast(data.frame(x = rep(1:12, time = 12)
                       , crs = crs("epsg:4326"))
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 8, fig.width= 6, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=8, fig.width=6, fig.alt='Future climate'}
 plot(xx.ras.future)
 ```
 
@@ -131,7 +125,7 @@ xx.future.samp <- xx.future[samp, ]
 coord.samp <- coord[samp, ]
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 6, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=5, fig.width=6, fig.alt='Sampled individual coordinates'}
 plot(coord.samp, cex = 0.2, xlim = c(0, 12), ylim = c(0, 12), col = "red")
 ```
 
@@ -153,14 +147,14 @@ The function accommodates individual genotypes or allele frequencies.
 
 The first step of the procedure is to regress the genetic matrix against the environmental predictors using a RDA model.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 6}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height=5, fig.width=6, fig.alt='rda output'}
 RDA_env <- rda(Y ~ .,  xx.current)
 plot(RDA_env)
 ```
 
 We then have to choose a number of RDA axes to include when conducting the genome scan.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 6}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height=4, fig.width=6, fig.alt='screeplot'}
 screeplot(RDA_env, main = "Eigenvalues of constrained axes")
 ```
 
@@ -186,7 +180,7 @@ The function found 215 outliers.
 
 Once the outliers have been identified, it can be useful to visualize their distribution in comparison with neutral loci using either a RDA biplot.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width= 6, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=5, fig.width=6, fig.alt='Biplot of RDA loci and variables scores'}
 ## Formatting table for ggplot
 locus_scores <- as.data.frame(scores(RDA_env, choices=c(1:2), display="species", scaling="none"))
 TAB_loci <- data.frame(names = row.names(locus_scores), locus_scores)
@@ -234,7 +228,7 @@ RDA_outliers <- rda(Y[, outliers] ~ .,  xx.current)
 
 A RDA biplot allows us to visualize the relationship between the outlier loci and the underlying environmental predictors.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width = 5, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=5, fig.width=5, fig.alt='RDA biplot'}
 TAB_loci <- as.data.frame(scores(RDA_outliers, choices = c(1:2), display = "species", scaling="none"))
 TAB_var <- as.data.frame(scores(RDA_outliers, choices = c(1:2), display = "bp"))
 
@@ -279,7 +273,7 @@ res_RDA_proj_current <- adaptive_index(RDA = RDA_outliers
 
 The `adaptive_index` function thus provides an estimate of adaptive genetic similarity or difference of all pixels on the landscape as a function of the values of the environmental predictors at that location. When projected on a map it allows visualizing the different adaptive gradients across a species range.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width=10, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=5, fig.width=10, fig.alt='Adaptive genetic similarity'}
 TAB_RDA <- as.data.frame(res_RDA_proj_current, xy = TRUE)
 for (i in 3:ncol(TAB_RDA)) {
   TAB_RDA[, i] <- (TAB_RDA[, i] - min(TAB_RDA[, i])) / (max(TAB_RDA[, i]) - min(TAB_RDA[, i]))
@@ -317,7 +311,7 @@ ggplot(data = TAB_RDA, aes(x = x, y = y, fill = value_cut)) +
 
 Once the genetic \~ environment relationship is characterized, it can be extrapolated to future environments to predict a potential shift in adaptive optimum induced by climate change using the `genomic_offset` function.The RDA-based method to predict this future maladaptation is relatively simple. As done above, RDA can be used to predict the optimal adaptive genetic composition for each environmental site under consideration, using both current and future environmental conditions. The difference between the two predictions provides an estimate of the change in genetic composition that would be required to track climate change.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10, fig.alt='Genomic offset'}
 ## Projecting the adaptive landscape after the change in environment 
 res_RDA_proj <- genomic_offset(RDA = RDA_outliers
                                , K = 2
@@ -328,12 +322,11 @@ res_RDA_proj <- genomic_offset(RDA = RDA_outliers
 
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 5, fig.width=7, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=5, fig.width=7, fig.alt='Genomic offset projected'}
 ## Table global genetic offset
 RDA_proj_offset <- as.data.frame(res_RDA_proj$Proj_offset_global, xy = TRUE)
 
 ## Projecting genomic offset on a map
-library(wesanderson)
 colors <- wes_palette("Zissou1", 100, type = "continuous")
 
 ggplot(data = RDA_proj_offset) + 
@@ -358,7 +351,7 @@ fitness.future <- rast(data.frame(x = rep(1:12, time = 12)
                        , crs = crs("epsg:4326"))
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width=6, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=4, fig.width=6, fig.alt='Fitness in function of genomic offset'}
 TAB <- data.frame(GO = RDA_proj_offset$Global_offset, Fitness = as.numeric(fitness.future[]))
 ggplot(data = TAB, aes(x=GO, y=Fitness)) +
   geom_point(size = 2, alpha = 0.7) +
@@ -387,7 +380,7 @@ offset_samp <- genomic_offset(RDA = RDA_outliers
 
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.width=10, fig.height=4, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.width=10, fig.height=4, fig.alt='Genomic offset for specific pop'}
 ## Visualization
 TAB_OFF <- data.frame(coord.samp, offset_samp$genomic_offset)
 TAB_OFF <- melt(TAB_OFF, id.vars = c("x","y"))
@@ -420,7 +413,7 @@ offset_gar <- genomic_offset(RDA = RDA_outliers
                              , method = "loadings")
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 10, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=4, fig.width=10, fig.alt='Genomic offset for transplantation'}
 ## Visualization
 TAB_OFF <- data.frame(coord, offset_gar$genomic_offset)
 TAB_OFF <- melt(TAB_OFF, id.vars = c("x","y"))
@@ -459,7 +452,7 @@ RDA models can also be used to find covarying sets of loci using the `loci_modul
 modules <- loci_modules(RDA = RDA_outliers, nb_clusters = 4)
 ```
 
-```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center', fig.align='center', fig.height = 4, fig.width= 5, echo=FALSE}
+```{r, message=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.align='center', fig.height=4, fig.width=5, fig.alt='Outlier loci modules'}
 ## Visualization
 ggplot() +
   geom_polygon(data = modules$polygons
@@ -498,7 +491,7 @@ RDA_samp <- rda(Y.samp[,outliers] ~ .,  xx.current.samp)
 groups <- adaptive_groups(RDA = RDA_samp, K = 2, nb_clusters = 3)
 ```
 
-```{r, message=FALSE, results='hide', eval=TRUE, fig.align='center', fig.align='center', fig.height = 4, fig.width= 5, echo=FALSE}
+```{r, message=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.align='center', fig.height=4, fig.width=5, fig.alt='rda for N optimal groups'}
 ## Visualization on the landscape
 TAB <- data.frame(coord.samp, cluster = groups$samples$cluster)
 
@@ -514,12 +507,12 @@ ggplot(TAB, aes(x = x, y = y, color = factor(cluster))) +
 
 `adaptive_groups` accommodates discrete populations as above, or a `RasterStack` as below.
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width= 5}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height=4, fig.width=5, fig.alt='Adaptive groups'}
 ## Finds N groups on the adaptive landscape projected from the RDA model
 groups <- adaptive_groups(RDA = RDA_samp, K = 2, env = xx.ras.current, nb_clusters = 9)
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, fig.align='center', fig.height = 4, fig.width=5, echo=FALSE}
+```{r, message=FALSE, warning=FALSE, results='hide', eval=TRUE, echo=FALSE, fig.align='center', fig.height=4, fig.width=5, fig.alt='Adaptive groups on the landscape'}
 ## Visualization of the adaptive groups on the landscape
 ggplot(data = groups$samples) + 
   geom_raster(aes(x = x, y = y, fill = as.factor(cluster))) + 
